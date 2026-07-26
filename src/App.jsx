@@ -203,7 +203,7 @@ function AppShell() {
             />
           </Toolbar>
         </AppBar>
-        )};
+        )}
         <NavBar
           mobileOpen={mobileOpen}
           handleDrawerToggle={handleDrawerToggle}

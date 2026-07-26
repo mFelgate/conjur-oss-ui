@@ -4,6 +4,14 @@ A lightweight React-based administration interface for Conjur OSS. It provides a
 
 The goal is to provide a simple developer-friendly interface for learning, testing, and working with Conjur OSS.
 
+## Highlights
+
+- 🔐 OIDC and password authentication support
+- 🚀 Server-side pagination and search for large Conjur environments
+- 📝 Interactive YAML policy editor with validation and dry-run support
+- 🔑 Dynamic authenticator creation using Conjur APIs
+- ⚛️ Modern React-based UI built on Conjur REST APIs
+
 ## Table of Contents
 
 - [About](#about)
@@ -20,11 +28,13 @@ The goal is to provide a simple developer-friendly interface for learning, testi
 
 ## About
 
-Conjur React UI started as a personal project to learn React after transitioning from the Conjur engineering team.
+Conjur React UI is a modern, lightweight web administration interface for Conjur OSS.
 
-Having spent several years working on Conjur, I wanted to build a lightweight, modern web interface that makes Conjur OSS easier to explore and manage. The project is intended to complement the existing CLI and REST API by providing a graphical interface for common workflows, while also serving as a learning tool for developers new to Conjur.
+The project provides a graphical interface for managing common Conjur workflows, including resources, secrets, policies, groups, and authenticators, while complementing the existing CLI and REST API.
 
-The long-term goal is to continue expanding the application into a simple, open source management interface for Conjur OSS.
+Having spent several years working on Conjur, I wanted to build a simple and extensible UI that makes Conjur OSS easier to explore, configure, and manage. The goal is to provide a developer-friendly interface that can scale from local development environments to larger Conjur deployments.
+
+The project is designed around Conjur's existing APIs and supports modern authentication workflows, including OIDC, while keeping the UI lightweight and easy to extend.
 
 ## Non-Goals
 
@@ -37,7 +47,7 @@ To maintain that focus, the following features are **explicitly out of scope**:
 
 For production deployments, high-availability configurations, compliance reporting, and enterprise secret lifecycle management, please refer to the official CyberArk Conjur Enterprise documentation.
 
-## Features for V1
+## Features
 
 ### Authentication
 - ✅ Password authentication
@@ -80,8 +90,10 @@ For production deployments, high-availability configurations, compliance reporti
 
 ### Scaling and Visualization
 - ✅ Server-side resource search
-- ✅ Resource pagination
-- ⬜ Advanced resource filtering
+- ✅ Server-side pagination
+- ✅ Resource filtering
+- ⬜ Advanced resource visualization
+- ⬜ Role Graph visualization
 
 ## Development Environment
 
@@ -95,7 +107,7 @@ For detailed setup instructions, Docker configuration, networking requirements, 
 
 The Conjur backend should be started using the official Conjur development instructions:
 
-https://github.com/cyberark/conjur/blob/master/CONTRIBUTING.mdgit
+https://github.com/cyberark/conjur/blob/master/CONTRIBUTING.md
 
 ## Screenshots
 
@@ -117,7 +129,7 @@ This includes server side filtering, searching and pagination
 ![Resources List](./screenshots/resourcepage.png)
 
 #### Resource Details
-View resource metadata, annotations, permissions, and ownership. Different sections will be displayed based on resource type, like gorup, secret and policy.
+View resource metadata, annotations, permissions, and ownership. Different sections will be displayed based on resource type, like group, secret and policy.
 
 ![Resource Details](./screenshots/ResourceDetails.png)
 
@@ -154,7 +166,7 @@ Browse all configured authenticators.
 ![Authenticators List](./screenshots/AuthenticatorsView.png)
 
 #### Authenticator Details
-View authenticator configuration and mange its secret values and groups.
+View authenticator configuration and manage its secret values and groups.
 
 ![Authenticator Details](./screenshots/AuthenticatorDetails.png)
 
