@@ -15,6 +15,34 @@ services:
     networks:
       - conjur-dev_default
 
+  keycloak:
+    profiles:
+      - oidc
+    image: quay.io/keycloak/keycloak:latest
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin123
+      KC_DB: dev-file
+      KEYCLOAK_FRONTEND_URL: http://host.docker.internal:8080
+      KC_HOSTNAME: host.docker.internal
+      KC_HOSTNAME_STRICT: 'false'
+      KC_HTTP_ENABLED: 'true'
+      KC_PROXY: edge
+      KC_LOG_LEVEL: DEBUG
+    ports:
+      - '8080:8080'
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+    command:
+      - start-dev
+    networks:
+      conjur-dev_default:
+        aliases:
+          - keycloak.local
+
+volumes:
+  keycloak_data:
+
 networks:
   conjur-dev_default:
     external: true

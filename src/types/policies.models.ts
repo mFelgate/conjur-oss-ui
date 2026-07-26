@@ -30,3 +30,35 @@ export interface LoadedPolicyResponse {
   created_roles: Record<string, { id: string; api_key: string }>
   version: number
 }
+
+export interface PolicyLoadResponse {
+  status: string;
+  created: PolicyChangeSet;
+  updated: PolicyUpdateSet;
+  deleted: PolicyChangeSet;
+}
+
+export interface PolicyChangeSet {
+  items: PolicyResource[];
+}
+
+export interface PolicyUpdateSet {
+  before: PolicyChangeSet;
+  after: PolicyChangeSet;
+}
+
+export interface PolicyResource {
+  identifier: string;
+  id: string;
+  type: string;
+  owner: string;
+  policy: string | null;
+
+  permissions?: Record<string, unknown>;
+  permitted?: Record<string, unknown>;
+  annotations?: Record<string, string>;
+
+  members?: string[];
+  memberships?: string[];
+  restricted_to?: string[];
+}

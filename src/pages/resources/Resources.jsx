@@ -87,9 +87,8 @@ export default function Resources() {
   // Stores friendly error text when a request fails.
   const [error, setError] = useState("");
 
-
   function handleTypeChange(event) {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
       type: event.target.value,
     }));
@@ -127,12 +126,10 @@ export default function Resources() {
           count: true,
         });
 
-     
         // Only update state if component still exists.
         if (isMounted) {
           setResources(response);
-           setCount(countRespons.count);
-
+          setCount(countRespons.count);
         }
       } catch (requestError) {
         // Normalize unknown error into a readable string.
@@ -161,18 +158,12 @@ export default function Resources() {
   }, [filters.type, filters.search, page, rowsPerPage]);
 
   useEffect(() => {
-
-  setFilters((prev) => ({
-
-    ...prev,
-
-    type: searchParams.get("kind") ?? "",
-
-  }));
-
-  setPage(0);
-
-}, [searchParams]);
+    setFilters((prev) => ({
+      ...prev,
+      type: searchParams.get("kind") ?? "",
+    }));
+    setPage(0);
+  }, [searchParams]);
 
   return (
     // Outer page spacing wrapper.
@@ -202,13 +193,17 @@ export default function Resources() {
           <Stack direction="row" spacing={2} flexWrap="wrap">
             <TextField
               label="Search resources"
-               value={searchInput}
-             onChange={(e) => setSearchInput(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Type id or kind"
               fullWidth
             />
 
-            <Select value={filters.type || ""} onChange={handleTypeChange} displayEmpty>
+            <Select
+              value={filters.type || ""}
+              onChange={handleTypeChange}
+              displayEmpty
+            >
               <MenuItem value="">All Resources</MenuItem>
               <MenuItem value="host">Hosts</MenuItem>
               <MenuItem value="variable">Variables</MenuItem>
@@ -250,6 +245,20 @@ export default function Resources() {
           {/* Data list */}
           {!loading && !error && resources.length > 0 && (
             <TableContainer component={Paper}>
+              <TablePagination
+                component="div"
+                count={count}
+                page={page}
+                onPageChange={(event, newPage) => {
+                  setPage(newPage);
+                }}
+                rowsPerPage={rowsPerPage}
+                onRowsPerPageChange={(event) => {
+                  setRowsPerPage(parseInt(event.target.value, 10));
+                  setPage(0);
+                }}
+                rowsPerPageOptions={[10, 25, 50, 100]}
+              />
               <Table
                 sx={{ minWidth: 650 }}
                 size="small"
@@ -271,20 +280,6 @@ export default function Resources() {
                   ))}
                 </TableBody>
               </Table>
-              <TablePagination
-                component="div"
-                count={count}
-                page={page}
-                onPageChange={(event, newPage) => {
-                  setPage(newPage);
-                }}
-                rowsPerPage={rowsPerPage}
-                onRowsPerPageChange={(event) => {
-                  setRowsPerPage(parseInt(event.target.value, 10));
-                  setPage(0);
-                }}
-                rowsPerPageOptions={[10, 25, 50, 100]}
-              />
             </TableContainer>
           )}
         </Stack>

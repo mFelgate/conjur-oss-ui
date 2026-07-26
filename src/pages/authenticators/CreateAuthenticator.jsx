@@ -42,7 +42,7 @@ function AuthenticatorFields({ schema, data, onChange }) {
 export default function CreateAuthenticator() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
-    type: "OIDC",
+    type: "OIDC (Conjur UI/Conjur CLI)",
     name: "",
     enabled: true,
     data: {},

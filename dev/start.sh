@@ -2,4 +2,4 @@
 
 set -e
 
-docker compose up --build
+docker compose --profile oidc up --build

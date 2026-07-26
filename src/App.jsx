@@ -43,6 +43,7 @@ import PolicyLoad from "./pages/policies/PolicyLoad.jsx";
 import Resources from "./pages/resources/Resources.jsx";
 import ResourceDetail from "./pages/resources/ResourceDetails.jsx";
 import Dashboard from "./pages/dashboard/dashboard.jsx";
+import OIDCCallback from "./pages/OIDCCallback";
 
 import "./App.css";
 
@@ -264,6 +265,7 @@ function AppShell() {
                 </ProtectedRoute>
               }
             />
+            <Route path="/login/callback" element={<OIDCCallback />} />
             <Route
               path="/authenticators/create"
               element={

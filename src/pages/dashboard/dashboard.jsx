@@ -144,7 +144,7 @@ function AuthenticatorCount({ type }) {
 
         // Only update state if component still exists.
         if (isMounted) {
-          setResourceCount(response);
+          setResourceCount(response.count);
         }
       } catch (requestError) {
         // Normalize unknown error into a readable string.
@@ -197,7 +197,7 @@ function AuthenticatorCount({ type }) {
 
       {!loading && !error && (
         <Typography variant="h4" component="p" sx={{ p: 2 }}>
-          {resourceCount === 0 ? `No ${type} found.` : `${resourceCount.length}`}
+          {`${resourceCount}`}
         </Typography>
       )}
     </Paper>

@@ -117,10 +117,9 @@ function AddMember({ serviceId, onMemberAdded }) {
 }
 
 export default function MembershipGroups({ serviceId }) {
-  console.log("MembershipGroups serviceId:", serviceId);  const [members, setMembers] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
+  const [members, setMembers] = useState([]);
   async function handleDeleteMember(member, isMounted) {
     try {
       await membershipsService.removeMember("group", `${serviceId}`, member);
@@ -143,7 +142,6 @@ export default function MembershipGroups({ serviceId }) {
         setMembers(response);
       }
     } catch (requestError) {
-      console.log(requestError);
       if (isMounted) {
         setError(
           requestError instanceof Error

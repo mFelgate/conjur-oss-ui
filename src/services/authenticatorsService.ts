@@ -6,22 +6,26 @@ import type {
 } from '../types'
 const ACCOUNT = 'conjur.account'
 
-function normalizeAuthenticators(response: AuthenticatorsV2ListResponse): AuthenticatorV2Response[] {
-  if (Array.isArray(response)) {
-    return response
-  }
-
-  return response.authenticators
-}
 
 export const authenticatorsService = {
+  providers() {
+    const account = localStorage.getItem(ACCOUNT)?.trim()
+    const path = `/authn-oidc/cucumber/providers`
+    return apiRequest<ProviderResponse>(path, {
+      headers: {
+        accept: 'application/x.secretsmgr.v2beta+json',
+      },
+    })
+  },
   list(params: ListAuthenticatorsV2QueryRequest = {}) {
-    return apiRequest<AuthenticatorsV2ListEnvelopeResponse>('/authenticators/' + localStorage.getItem(ACCOUNT)?.trim(), {
+    const account = localStorage.getItem(ACCOUNT)?.trim()
+    const path = `/authenticators/${account}`
+    return apiRequest<AuthenticatorsV2ListEnvelopeResponse>(path, {
       query: params,
       headers: {
         accept: 'application/x.secretsmgr.v2beta+json',
       },
-    }).then(normalizeAuthenticators)
+    })
   },  
   get(type, service_id) {
     const account = localStorage.getItem(ACCOUNT)?.trim()

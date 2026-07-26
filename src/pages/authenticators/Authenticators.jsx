@@ -6,7 +6,10 @@ import {
   CircularProgress,
   Container,
   Button,
+  Select,
+  MenuItem,
   Stack,
+  TablePagination,
   TextField,
   Typography,
 } from "@mui/material";
@@ -26,39 +29,9 @@ import Tooltip from "@mui/material/Tooltip";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
-export default function Authenticators() {
-  const navigate = useNavigate();
 
-  const [authenticators, setAuthenticators] = useState([]);
-
-  const [loading, setLoading] = useState(true);
-
-  // Stores friendly error text when a request fails.
-  const [error, setError] = useState("");
-
-  // Controlled input value for search text.
-  const [search, setSearch] = useState("");
-
-  // Memoized filtered list (runs only when resources/search changes).
-  // This is client-side filtering for learning/demo purposes.
-  const filteredAuthenticators = useMemo(() => {
-    // Normalize search value for case-insensitive compare.
-    const query = search.trim().toLowerCase();
-
-    // If query is empty, show all data.
-    if (!query) {
-      return authenticators;
-    }
-
-    // Filter by id/kind text.
-    return authenticators.filter((authenticator) => {
-      const type = String(authenticator.type ?? "").toLowerCase();
-      const name = String(authenticator.name ?? "").toLowerCase();
-      return name.includes(query) || type.includes(query);
-    });
-  }, [authenticators, search]);
-
-  function AuthenticatorItem({ authenticator }) {
+function AuthenticatorItem({ authenticator, handleDeleteAuthenticator, handleToggleAuthenticator }) {
+    const navigate = useNavigate();
     return (
       <TableRow
         key={`${authenticator.type}:${authenticator.name}`}
@@ -109,6 +82,62 @@ export default function Authenticators() {
     );
   }
 
+export default function Authenticators() {
+    const navigate = useNavigate();
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [count, setCount] = useState(0);
+  const [authType, setAuthType] = useState(0);
+  const [authenticators, setAuthenticators] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+  // Stores friendly error text when a request fails.
+  const [error, setError] = useState("");
+  // Controlled input value for search text.
+
+  function handleTypeChange(event) {
+    setAuthType(event.target.value);
+    setPage(0);
+  }
+
+
+  async function loadAuthenticators(isMounted) {
+      // Request started: set loading true and clear previous error.
+      setLoading(true);
+      setError("");
+
+      try {
+        // Service call returns a Promise.
+        // Service normalizes the endpoint's supported response shapes into an array.
+        const response = await authenticatorsService.list({
+          offset: page * rowsPerPage,
+          limit: rowsPerPage,
+          type: authType || undefined,
+        });
+
+        // Only update state if component still exists.
+        if (isMounted) {
+          console.log("authenticators response:", response);
+          setAuthenticators(response.authenticators);
+          setCount(response.count);
+        }
+      } catch (requestError) {
+        // Normalize unknown error into a readable string.
+        if (isMounted) {
+          setError(
+            requestError instanceof Error
+              ? requestError.message
+              : "Failed to load authenticators.",
+          );
+        }
+      } finally {
+        // Always clear loading after request finishes.
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    }
+
   async function handleToggleAuthenticator(authenticator, checked) {
     try {
       const updatedAuthenticator = await authenticatorsService.update(
@@ -136,8 +165,8 @@ export default function Authenticators() {
         authenticator.type,
         authenticator.name,
       );
-      const response = await authenticatorsService.list();
-      setAuthenticators(response);
+      loadAuthenticators(true);
+
     } catch (error) {
       setError(error instanceof Error ? error.message : "Update failed.");
     }
@@ -147,44 +176,13 @@ export default function Authenticators() {
   useEffect(() => {
     // Prevents state updates if component unmounts before request completes.
     let isMounted = true;
-    async function loadAuthenticator() {
-      // Request started: set loading true and clear previous error.
-      setLoading(true);
-      setError("");
-
-      try {
-        // Service call returns a Promise.
-        // Service normalizes the endpoint's supported response shapes into an array.
-        const response = await authenticatorsService.list();
-
-        // Only update state if component still exists.
-        if (isMounted) {
-          setAuthenticators(response);
-        }
-      } catch (requestError) {
-        // Normalize unknown error into a readable string.
-        if (isMounted) {
-          setError(
-            requestError instanceof Error
-              ? requestError.message
-              : "Failed to load authenticators.",
-          );
-        }
-      } finally {
-        // Always clear loading after request finishes.
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    }
-
-    loadAuthenticator();
+    loadAuthenticators(isMounted);
 
     // Cleanup runs on unmount.
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [page, rowsPerPage, authType]);
 
   return (
     <Box sx={{ py: 4 }}>
@@ -211,14 +209,22 @@ export default function Authenticators() {
           </Button>
         </Box>
         <Stack spacing={2} sx={{ mt: 3 }}>
-          <TextField
-            label="Search authenticators"
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Type name or type"
-            fullWidth
-          />
-
+          <Stack direction="row" spacing={2} flexWrap="wrap">
+            <Select
+              value={authType || ""}
+              onChange={handleTypeChange}
+              displayEmpty
+            >
+              <MenuItem value="">All Authenticators</MenuItem>
+              <MenuItem value="oidc">OIDC</MenuItem>
+              <MenuItem value="azure">Azure</MenuItem>
+              <MenuItem value="ldap">LDAP</MenuItem>
+              <MenuItem value="gcp">GCP</MenuItem>
+              <MenuItem value="cert">Certificate</MenuItem>
+              <MenuItem value="jwt">JWT</MenuItem>
+              <MenuItem value="k8s">K8s</MenuItem>
+            </Select>
+          </Stack>
           {loading && (
             <Stack direction="row" spacing={1} alignItems="center">
               <CircularProgress size={18} />
@@ -232,17 +238,22 @@ export default function Authenticators() {
             <Alert severity="info">No authenticators returned by API.</Alert>
           )}
 
-          {!loading &&
-            !error &&
-            authenticators.length > 0 &&
-            filteredAuthenticators.length === 0 && (
-              <Alert severity="info">
-                No authenticators match your search.
-              </Alert>
-            )}
-
-          {!loading && !error && filteredAuthenticators.length > 0 && (
+          {!loading && !error && authenticators.length > 0 && (
             <TableContainer component={Paper}>
+              <TablePagination
+                component="div"
+                count={count}
+                page={page}
+                onPageChange={(event, newPage) => {
+                  setPage(newPage);
+                }}
+                rowsPerPage={rowsPerPage}
+                onRowsPerPageChange={(event) => {
+                  setRowsPerPage(parseInt(event.target.value, 10));
+                  setPage(0);
+                }}
+                rowsPerPageOptions={[10, 25, 50, 100]}
+              />
               <Table
                 sx={{ minWidth: 650 }}
                 size="small"
@@ -258,10 +269,12 @@ export default function Authenticators() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {filteredAuthenticators.map((authenticator) => (
+                  {authenticators.map((authenticator) => (
                     <AuthenticatorItem
                       key={`${authenticator.type}:${authenticator.name}`}
                       authenticator={authenticator}
+                      handleDeleteAuthenticator={handleDeleteAuthenticator}
+                      handleToggleAuthenticator={handleToggleAuthenticator}
                     />
                   ))}
                 </TableBody>
