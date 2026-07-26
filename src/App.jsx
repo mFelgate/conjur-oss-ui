@@ -176,6 +176,7 @@ function AppShell() {
   return (
     <>
       <Box sx={{ display: "flex" }}>
+        {showNavbar && (
         <AppBar
           position="fixed"
           sx={{
@@ -202,6 +203,7 @@ function AppShell() {
             />
           </Toolbar>
         </AppBar>
+        )};
         <NavBar
           mobileOpen={mobileOpen}
           handleDrawerToggle={handleDrawerToggle}

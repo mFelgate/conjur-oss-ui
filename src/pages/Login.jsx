@@ -17,20 +17,17 @@ export default function Login() {
   const { login, loading, error } = useAuth();
   const navigate = useNavigate();
   const [localLoading, setLocalLoading] = useState(false);
-  const [account, setAccount] = useState("");
   const [loginName, setLoginName] = useState("");
   const [apiKey, setApiKey] = useState("");
   const [localError, setLocalError] = useState("");
-  const ACCOUNT = "conjur.account";
   const [providers, setProviders] = useState([]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLocalError("");
 
-    try {
-      await login({ account, login: loginName, apiKey });
-      localStorage.setItem(ACCOUNT, account);
+    try {    
+      await login({login: loginName, apiKey });
       navigate("/dashboard");
     } catch (requestError) {
       setLocalError(
@@ -87,18 +84,12 @@ export default function Login() {
             Login
           </Typography>
           <Typography variant="body1" sx={{ mb: 3 }}>
-            Sign in with your Conjur account, login, and API key to load
+            Sign in with your Conjur login, and API key to load
             authenticated data.
           </Typography>
 
           <Box component="form" onSubmit={handleSubmit}>
             <Stack spacing={2}>
-              <TextField
-                label="Account"
-                value={account}
-                onChange={(event) => setAccount(event.target.value)}
-                fullWidth
-              />
               <TextField
                 label="Login"
                 value={loginName}

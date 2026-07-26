@@ -1,10 +1,11 @@
 import { apiRequest } from './apiClient'
 import type { ListResourcesRequest, ResourcesResponse } from '../types'
-const ACCOUNT = localStorage.getItem('conjur.account')
+import { CONJUR_ACCOUNT } from "../config";
+const RootPath = `/resources/${encodeURIComponent(CONJUR_ACCOUNT)}`;
 
 export const resourcesService = {
   list(params: ListResourcesRequest = {}) {
-    return apiRequest<ResourcesResponse>('/resources/' + ACCOUNT.trim(), {
+    return apiRequest<ResourcesResponse>(RootPath, {
       query: {
         offset: 0,
         limit: 100,
@@ -12,7 +13,7 @@ export const resourcesService = {
       }
     })
   }, get (kind, identifier) {
-    const path = `/resources/${ACCOUNT?.trim()}/${encodeURIComponent(kind)}/${encodeURIComponent(identifier)}`
+    const path = `${RootPath}/${encodeURIComponent(kind)}/${encodeURIComponent(identifier)}`
     return apiRequest<ResourcesResponse>(path, {
       headers: {
         accept: 'application/json',

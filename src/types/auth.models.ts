@@ -4,7 +4,6 @@ export type AwsSignatureHeaderRequest = string
 export type K8sInjectClientCertRequest = string
 
 export interface ConjurAccessTokenRequest {
-  account: string
   login: string
   apiKey: string
 }

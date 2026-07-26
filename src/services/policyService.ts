@@ -4,19 +4,12 @@ import type {
   ListPolicyRequest,
   PolicyRecord,
 } from "../types";
-const ACCOUNT = localStorage.getItem("conjur.account")?.trim();
+import { CONJUR_ACCOUNT } from "../config";
+const RootPath = `/policies/${encodeURIComponent(CONJUR_ACCOUNT)}/policy`;
 
 export const policyService = {
-  list(params: ListPolicyRequest = {}) {
-    return apiRequest<ApiListResponse<PolicyRecord>>("/policy", {
-      query: params,
-    });
-  },
   getEffectivePolicy(serviceId: string) {
-    const account = localStorage.getItem("conjur.account")?.trim();
-
-    const path = `/policies/${encodeURIComponent(account)}/policy/${encodeURIComponent(serviceId)}`;
-
+    const path = `${RootPath}/${encodeURIComponent(serviceId)}`;
     return apiRequestText(path, {
       headers: {
         accept: "text/plain",
@@ -29,8 +22,7 @@ export const policyService = {
     method: string,
     dryRun: boolean = true,
   ) {
-    const account = localStorage.getItem("conjur.account")?.trim();
-    const path = `/policies/${encodeURIComponent(account)}/policy/${encodeURIComponent(branch)}`;
+    const path = `${RootPath}/${encodeURIComponent(branch)}`;
 
     const response = await apiRequestTextFullResponse(path, {
       method: method,

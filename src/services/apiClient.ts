@@ -1,5 +1,5 @@
-const viteEnv = (import.meta as { env?: Record<string, string> }).env;
-export const API_BASE_URL = viteEnv?.VITE_API_BASE_URL ?? "";
+import { API_BASE_URL, CONJUR_ACCOUNT } from "../config";
+
 
 export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
 

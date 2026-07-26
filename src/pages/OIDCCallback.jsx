@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useAuth } from "../auth/useAuth";
 import { useNavigate } from "react-router-dom";
 import { Box, CircularProgress, Typography, Alert } from "@mui/material";
 import { authService } from "../services/authService";
@@ -7,6 +8,7 @@ export default function OIDCCallback() {
   const TOKEN_STORAGE_KEY = 'conjur.accessToken'
   const navigate = useNavigate();
   const [error, setError] = useState("");
+  const { setAccessToken } = useAuth();
 
   useEffect(() => {
     async function authenticate() {
@@ -39,19 +41,16 @@ export default function OIDCCallback() {
           throw new Error("Missing OIDC session data.");
         }
 
-        const account = "cucumber"; // make this dynamic later
 
         const token = await authService.oidcLogin(
           serviceId,
-          account,
           code,
           nonce,
           codeVerifier,
         );
 
         console.log("OIDC login successful, token received:", token);
-        localStorage.setItem(TOKEN_STORAGE_KEY, token);
-        localStorage.setItem("conjur.account", account);
+        setAccessToken(token);
 
         sessionStorage.removeItem("oidc_nonce");
         sessionStorage.removeItem("oidc_code_verifier");

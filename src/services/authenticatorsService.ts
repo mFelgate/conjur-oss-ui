@@ -4,12 +4,12 @@ import type {
   AuthenticatorsV2ListResponse,
   ListAuthenticatorsV2QueryRequest,
 } from '../types'
-const ACCOUNT = 'conjur.account'
+import { CONJUR_ACCOUNT } from "../config";
+const RootPath = `/authenticators/${encodeURIComponent(CONJUR_ACCOUNT)}`;
 
 
 export const authenticatorsService = {
   providers() {
-    const account = localStorage.getItem(ACCOUNT)?.trim()
     const path = `/authn-oidc/cucumber/providers`
     return apiRequest<ProviderResponse>(path, {
       headers: {
@@ -18,9 +18,7 @@ export const authenticatorsService = {
     })
   },
   list(params: ListAuthenticatorsV2QueryRequest = {}) {
-    const account = localStorage.getItem(ACCOUNT)?.trim()
-    const path = `/authenticators/${account}`
-    return apiRequest<AuthenticatorsV2ListEnvelopeResponse>(path, {
+    return apiRequest<AuthenticatorsV2ListEnvelopeResponse>(RootPath, {
       query: params,
       headers: {
         accept: 'application/x.secretsmgr.v2beta+json',
@@ -28,8 +26,7 @@ export const authenticatorsService = {
     })
   },  
   get(type, service_id) {
-    const account = localStorage.getItem(ACCOUNT)?.trim()
-    const path = `/authenticators/${account}/${type}/${service_id}`
+    const path = `${RootPath}/${encodeURIComponent(type)}/${encodeURIComponent(service_id)}`
     return apiRequest<AuthenticatorV2Response>(path, {
       headers: {
         accept: 'application/x.secretsmgr.v2beta+json',
@@ -37,8 +34,7 @@ export const authenticatorsService = {
     })
   },
   update(enablement, type, service_id) {
-    const account = localStorage.getItem(ACCOUNT)?.trim()
-    const path = `/authenticators/${account}/${type}/${service_id}`
+    const path = `${RootPath}/${encodeURIComponent(type)}/${encodeURIComponent(service_id)}`
     return apiRequest<AuthenticatorV2Response>(path , {
 			method: 'PATCH',
       headers: {
@@ -50,8 +46,7 @@ export const authenticatorsService = {
     },)
 	},  
 	delete(type, service_id) {
-    const account = localStorage.getItem(ACCOUNT)?.trim()
-    const path = `/authenticators/${account}/${type}/${service_id}`
+    const path = `${RootPath}/${encodeURIComponent(type)}/${encodeURIComponent(service_id)}`
     return apiRequest<void>(path , {
 			method: 'DELETE',
       headers: {
@@ -59,8 +54,7 @@ export const authenticatorsService = {
       },
     },)
 	}, create(authenticator) {
-    const account = localStorage.getItem(ACCOUNT)?.trim()
-    const path = `/authenticators/${account}`
+    const path = `${RootPath}`
     return apiRequest<AuthenticatorV2Response>(path , {
 			method: 'POST',
       headers: {

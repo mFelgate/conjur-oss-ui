@@ -4,9 +4,7 @@ import type {
   ConjurAccessTokenRequest,
   PasswordLoginRequest,
 } from "../types";
-
-const viteEnv = (import.meta as { env?: Record<string, string> }).env;
-const DEFAULT_CONJUR_ACCOUNT = viteEnv?.VITE_CONJUR_ACCOUNT ?? "";
+import { CONJUR_ACCOUNT } from "../config";
 function toBase64(value: string): string {
   const bytes = new TextEncoder().encode(value);
   let binary = "";
@@ -19,7 +17,6 @@ function toBase64(value: string): string {
 }
 
 function normalizeConjurToken(rawToken: string): string {
-  console.log("Normalizing Conjur token:", rawToken);
   const token = rawToken?.trim();
 
   // Conjur authenticate commonly returns a JSON token object as text.
@@ -32,8 +29,8 @@ function normalizeConjurToken(rawToken: string): string {
 }
 
 export const authService = {
-  getAccessToken(account: string, login: string, apiKey: string) {
-    const path = `/authn/${encodeURIComponent(account)}/${encodeURIComponent(login)}/authenticate`;
+  getAccessToken(login: string, apiKey: string) {
+    const path = `/authn/${encodeURIComponent(CONJUR_ACCOUNT)}/${encodeURIComponent(login)}/authenticate`;
 
     return apiRequestText(path, {
       method: "POST",
@@ -49,14 +46,11 @@ export const authService = {
 
   oidcLogin(
     serviceId: string,
-    account: string,
     code: string,
     nonce: string,
     codeVerifier: string,
   ) {
-    const path = `/authn-oidc/${serviceId}/${account}/authenticate`;
-
-    console.log("Calling OIDC login with path:", path);
+    const path = `/authn-oidc/${serviceId}/${CONJUR_ACCOUNT}/authenticate`;
 
     return apiRequestText(path, {
       method: "GET",
@@ -67,31 +61,18 @@ export const authService = {
       },
     }).then((rawToken) => {
       const token = normalizeConjurToken(rawToken);
-
       localStorage.setItem("conjur_access_token", token);
 
       return token;
     });
   },
 
-  login(credentials: PasswordLoginRequest | ConjurAccessTokenRequest) {
-    if ("account" in credentials) {
-      return authService.getAccessToken(
-        credentials.account,
-        credentials.login,
-        credentials.apiKey,
-      );
-    }
-
-    if (!DEFAULT_CONJUR_ACCOUNT) {
+  login(credentials: ConjurAccessTokenRequest) {
+    if (!CONJUR_ACCOUNT) {
       throw new Error("Missing VITE_CONJUR_ACCOUNT. Set it in .env.local.");
     }
 
-    return authService.getAccessToken(
-      DEFAULT_CONJUR_ACCOUNT,
-      credentials.username,
-      credentials.password,
-    );
+    return authService.getAccessToken( credentials.login, credentials.apiKey);
   },
 
   whoAmI() {

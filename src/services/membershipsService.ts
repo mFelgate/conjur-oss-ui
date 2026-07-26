@@ -6,11 +6,10 @@ import type {
   ShowRoleQueryRequest,
 } from '../types'
 
-const ACCOUNT = 'conjur.account'
+import { CONJUR_ACCOUNT } from "../config";
 
 function rolePath(kind: string, identifier: string) {
-  const account = localStorage.getItem(ACCOUNT)?.trim()
-  return `/roles/${account}/${encodeURIComponent(kind)}/${encodeURIComponent(identifier)}`
+  return `/roles/${CONJUR_ACCOUNT}/${encodeURIComponent(kind)}/${encodeURIComponent(identifier)}`
 }
 
 export const membershipsService = {

@@ -11,16 +11,20 @@ export function AuthProvider({ children }) {
   const [error, setError] = useState('')
 
 
+  const setAccessToken = (accessToken) => {
+    const normalizedToken = accessToken.trim();
+    setToken(normalizedToken);
+    localStorage.setItem(TOKEN_STORAGE_KEY, normalizedToken);
+    return normalizedToken;
+  };
+
   const login = async (credentials) => {
     setLoading(true)
     setError('')
 
     try {
       const accessToken = await authService.login(credentials)
-      const normalizedToken = accessToken.trim()
-      setToken(normalizedToken)
-      localStorage.setItem(TOKEN_STORAGE_KEY, normalizedToken)
-      return normalizedToken
+      return setAccessToken(accessToken)
     } catch (requestError) {
       const message = requestError instanceof Error ? requestError.message : 'Login failed.'
       setError(message)
@@ -44,6 +48,7 @@ export function AuthProvider({ children }) {
       error,
       login,
       logout,
+      setAccessToken,
     }),
     [token, loading, error],
   )

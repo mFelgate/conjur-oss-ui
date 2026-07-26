@@ -4,15 +4,16 @@ import type {
   ListSecretsRequest,
   SecretRecord,
 } from "../types";
-const ACCOUNT = localStorage.getItem("conjur.account")?.trim();
+import {CONJUR_ACCOUNT} from "../config";
+const RootPath = `/secrets/${encodeURIComponent(CONJUR_ACCOUNT)}`;
 
 export const secretsService = {
   get(kind, identifier) {
-    const path = `/secrets/${encodeURIComponent(ACCOUNT)}/${encodeURIComponent(kind)}/${encodeURIComponent(identifier)}`;
+    const path = `${RootPath}/${encodeURIComponent(kind)}/${encodeURIComponent(identifier)}`;
     return apiRequestText<ApiListResponse<SecretRecord>>(path);
   },
   async set(kind, identifier, value) {
-    const path = `/secrets/${encodeURIComponent(ACCOUNT)}/${encodeURIComponent(kind)}/${encodeURIComponent(identifier)}`;
+    const path = `${RootPath}/${encodeURIComponent(kind)}/${encodeURIComponent(identifier)}`;
     return apiRequestText<ApiListResponse<SecretRecord>>(path, {
       method: "POST",
       body: value
