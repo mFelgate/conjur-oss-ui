@@ -41,13 +41,14 @@ For production deployments, high-availability configurations, compliance reporti
 
 ### Authentication
 - ✅ Password authentication
-- ⬜ OIDC authentication
+- ✅ OIDC authentication
 
 ### Resources
 - ✅ View resources
 - ✅ View resource details
 - ✅ View resource annotations
 - ✅ View resource permissions
+- ⬜ Role Graph
 
 ### Secrets
 - ✅ Browse secrets
@@ -77,34 +78,10 @@ For production deployments, high-availability configurations, compliance reporti
 - ✅ Policy dry-run validation
 - ✅ View created, deleted, and updated resources during dry-run
 
-### V2 - Scaling and Visualization
-
-The goal of V2 is to improve usability for larger Conjur environments and make
-
-authorization relationships easier to understand.
-
-- ⬜ Role/resource graph visualization
-
-  - Visualize relationships between users, groups, layers, policies, resources, and permissions
-
-  - Help answer "why does this identity have access to this resource?"
-
+### Scaling and Visualization
 - ✅ Server-side resource search
-
-  - Move filtering from the UI into API queries
-
-  - Support searching large environments without loading all resources locally
-
 - ✅ Resource pagination
-
-  - Add offset/limit pagination for large resource collections
-
-  - Improve performance and initial load times
-
 - ⬜ Advanced resource filtering
-
-  - Filter by resource type, ownership, policy branch, and permissions
-
 
 ## Development Environment
 

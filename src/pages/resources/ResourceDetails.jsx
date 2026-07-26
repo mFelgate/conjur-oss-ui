@@ -119,10 +119,8 @@ export default function ResourceDetails() {
       setError("");
       try {
         const resource = await resourcesService.get(kind, serviceId);
-
         if (isMounted) {
           setResource(resource);
-          console.log("Resource loaded:", resource);
         }
       } catch (requestError) {
         if (isMounted) {

@@ -117,7 +117,6 @@ export async function apiRequestJson<T>(
 
     if (!response.ok) {
       const message = await response.text();
-      console.log(message);
       const apiError = JSON.parse(message) as ApiErrorResponse;
       throw new ApiError(apiError, response.status);
     }

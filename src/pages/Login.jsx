@@ -37,7 +37,6 @@ export default function Login() {
   };
 
   const handleOIDCLogin = async (provider) => {
-    console.log("Initiating OIDC login with provider:", provider.redirect_uri);
     sessionStorage.setItem("oidc_nonce", provider.nonce);
     sessionStorage.setItem("oidc_code_verifier", provider.code_verifier);
     sessionStorage.setItem("oidc_service_id", provider.service_id);
@@ -52,7 +51,6 @@ export default function Login() {
         // Only update state if component still exists.
         if (isMounted) {
           setProviders(response);
-          console.log("providers:", response);
         }
       } catch (requestError) {
         // Normalize unknown error into a readable string.

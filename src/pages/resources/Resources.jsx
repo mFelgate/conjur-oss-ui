@@ -112,7 +112,6 @@ export default function Resources() {
         // - Resource[]
         // - { items: Resource[] }
         // - { resources: Resource[] }
-        console.log("query type:", filters.type);
         const response = await resourcesService.list({
           kind: filters.type || undefined,
           search: filters.search || undefined,

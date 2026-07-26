@@ -117,7 +117,6 @@ export default function Authenticators() {
 
         // Only update state if component still exists.
         if (isMounted) {
-          console.log("authenticators response:", response);
           setAuthenticators(response.authenticators);
           setCount(response.count);
         }
