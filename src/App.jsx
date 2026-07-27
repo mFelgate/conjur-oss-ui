@@ -177,32 +177,32 @@ function AppShell() {
     <>
       <Box sx={{ display: "flex" }}>
         {showNavbar && (
-        <AppBar
-          position="fixed"
-          sx={{
-            display: { xs: "block", lg: "none" },
-          }}
-        >
-          <Toolbar>
-            <IconButton
-              color="inherit"
-              edge="start"
-              onClick={handleDrawerToggle}
-            >
-              <MenuIcon />
-            </IconButton>
+          <AppBar
+            position="fixed"
+            sx={{
+              display: { xs: "block", lg: "none" },
+            }}
+          >
+            <Toolbar>
+              <IconButton
+                color="inherit"
+                edge="start"
+                onClick={handleDrawerToggle}
+              >
+                <MenuIcon />
+              </IconButton>
 
-            <img
-              src="/conjur-logo.svg"
-              alt="Conjur"
-              style={{
-                width: "182px",
-                margin: "20px",
-                filter: "brightness(0) saturate(100%)",
-              }}
-            />
-          </Toolbar>
-        </AppBar>
+              <img
+                src="/conjur-logo.svg"
+                alt="Conjur"
+                style={{
+                  width: "182px",
+                  margin: "20px",
+                  filter: "brightness(0) saturate(100%)",
+                }}
+              />
+            </Toolbar>
+          </AppBar>
         )}
         <NavBar
           mobileOpen={mobileOpen}
@@ -212,10 +212,11 @@ function AppShell() {
           component="main"
           sx={{
             flexGrow: 1,
+             ml: { lg: `240px` },
             p: 3,
           }}
         >
-            <Toolbar sx={{ display: { xs: "block", lg: "none" } }} />
+          <Toolbar sx={{ display: { xs: "block", lg: "none" } }} />
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<Navigate to="/resources" replace />} />

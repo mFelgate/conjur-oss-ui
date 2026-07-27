@@ -134,7 +134,7 @@ export default function PolicyLoad() {
 
   return (
     <Box sx={{ py: 4 }}>
-      <Container maxWidth="lg">
+      <Container>
         <Stack spacing={3}>
           <Typography variant="h4">Load Policy</Typography>
 

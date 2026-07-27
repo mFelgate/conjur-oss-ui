@@ -77,7 +77,6 @@ body {
 }
 
 #root {
-  width: 1126px;
   max-width: 100%;
   margin: 0 auto;
   text-align: left;
@@ -88,7 +87,6 @@ body {
 }
 
 #root > section {
-  width: 1126px;
   max-width: 100%;
   margin-left: 0;
   margin-right: auto;
@@ -139,89 +137,3 @@ code {
 }
 
 
-/* Conjur Typography */
-/* 
-h6 {
-  font-family: "Inter", "Roboto", Arial, sans-serif;
-  color: #0b1f33;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  margin-bottom: 0.75rem;
-}
-
-h2 {
-  font-size: 2rem;
-  font-weight: 700;
-}
-
-h3 {
-  font-size: 1.5rem;
-  font-weight: 650;
-}
-
-h4 {
-  font-size: 1.25rem;
-  font-weight: 600;
-}
-
-h5 {
-  font-size: 1.1rem;
-  font-weight: 600;
-}
-
-h6 {
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-
-.subtitle,
-.section-description {
-  color: #5f6b76;
-  font-size: 0.95rem;
-}
-
-
-.conjur-section-title {
-  color: #0b1f33;
-  border-bottom: 2px solid #00a6a6;
-  padding-bottom: 0.4rem;
-  margin-bottom: 1rem;
-}
-
-
-.conjur-label {
-  color: #64748b;
-  font-size: 0.85rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-:root {
-
-  --conjur-navy: #0b1f33;
-  --conjur-blue: #123b5d;
-  --conjur-primary: #0066cc;
-  --conjur-teal: #00a6a6;
-
-  --conjur-text: #1f2937;
-  --conjur-muted: #64748b;
-  --conjur-border: #d9e2ec;
-  --conjur-background: #f7f9fb;
-  --conjur-surface: #ffffff;
-
-  --conjur-success: #2e7d32;
-  --conjur-warning: #ed6c02;
-  --conjur-error: #d32f2f;
-}
-
-body {
-  background: var(--conjur-background);
-  color: var(--conjur-text);
-  font-family:
-    "Inter",
-    "Roboto",
-    Arial,
-    sans-serif;
-} */
