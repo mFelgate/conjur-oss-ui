@@ -205,7 +205,7 @@ export async function apiRequestTextFullResponse(
 
     if (!response.ok) {
       const message = await response.text();
-      if (options.dryRun) {
+      if (options.dryRun && response.status === 422) {
         const apiError = JSON.parse(message) as PolicyErrorResponse;
         throw new ApiError(apiError, response.status);
       }

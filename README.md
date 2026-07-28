@@ -16,8 +16,7 @@ The goal is to provide a simple developer-friendly interface for learning, testi
 
 - [About](#about)
 - [Non-Goals](#non-goals)
-- [Features for V1](#features-for-v1)
-- [V2 - Scaling and Visualization](#v2---scaling-and-visualization)
+- [Features](#features)
 - [Development Environment](#development-environment)
 - [Screenshots](#screenshots)
   - [Resources](#resources-1)
@@ -111,6 +110,15 @@ https://github.com/cyberark/conjur/blob/master/CONTRIBUTING.md
 
 ## Screenshots
 
+### Authentication
+#### Loginto the ui with a apikey or with oidc authentication if configured
+View an overview of the Conjur environment and common administration workflows.
+
+![Dashboard](./screenshots/login.png)
+
+---
+
+
 ### Dashboard
 
 #### Dashboard Overview
@@ -169,11 +177,6 @@ Browse all configured authenticators.
 View authenticator configuration and manage its secret values and groups.
 
 ![Authenticator Details](./screenshots/AuthenticatorDetails.png)
-
-#### Create Authenticator
-Create authenticators using guided forms.
-
-![Create Authenticator](./screenshots/CreateAuthenticator.png)
 
 #### Create Authenticator - Multiple Types
 Create authenticators across multiple supported authentication methods.

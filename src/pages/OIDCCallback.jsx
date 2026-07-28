@@ -13,21 +13,12 @@ export default function OIDCCallback() {
   useEffect(() => {
     async function authenticate() {
       try {
-        console.log("Starting OIDC callback authentication process...");
         const params = new URLSearchParams(window.location.search);
         const code = params.get("code");
-        console.log("Params:", params.toString());
 
         if (!code) {
           throw new Error("Missing authorization code.");
         }
-
-        // Optional UI state validation
-        // const storedState = sessionStorage.getItem("oidc_state");
-
-        // if (storedState && state !== storedState) {
-        //   throw new Error("Invalid OIDC state.");
-        // }
 
         const nonce = sessionStorage.getItem("oidc_nonce");
         const codeVerifier = sessionStorage.getItem(
@@ -48,10 +39,7 @@ export default function OIDCCallback() {
           nonce,
           codeVerifier,
         );
-
-        console.log("OIDC login successful, token received:", token);
         setAccessToken(token);
-
         sessionStorage.removeItem("oidc_nonce");
         sessionStorage.removeItem("oidc_code_verifier");
         sessionStorage.removeItem("oidc_service_id");

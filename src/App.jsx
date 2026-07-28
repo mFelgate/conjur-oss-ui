@@ -47,6 +47,14 @@ import OIDCCallback from "./pages/OIDCCallback";
 
 import "./App.css";
 
+function navPadding() {
+  if (location.pathname === "/login") {
+    return "0px";
+  }
+
+  return "240px";
+}
+
 function App() {
   return (
     <AuthProvider>
@@ -54,6 +62,75 @@ function App() {
         <AppShell />
       </BrowserRouter>
     </AuthProvider>
+  );
+}
+
+function AppRoutes() {
+  return (
+    <>
+      <Toolbar sx={{ display: { xs: "block", lg: "none" } }} />
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Navigate to="/resources" replace />} />
+        <Route
+          path="/resources"
+          element={
+            <ProtectedRoute>
+              <Resources />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/resources/:kind/:serviceId"
+          element={
+            <ProtectedRoute>
+              <ResourceDetail />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/authenticators"
+          element={
+            <ProtectedRoute>
+              <Authenticators />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/authenticators/:type/:name"
+          element={
+            <ProtectedRoute>
+              <AuthenticatorDetails />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/policy/load"
+          element={
+            <ProtectedRoute>
+              <PolicyLoad />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/login/callback" element={<OIDCCallback />} />
+        <Route
+          path="/authenticators/create"
+          element={
+            <ProtectedRoute>
+              <AuthenticatorForm />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </>
   );
 }
 
@@ -208,76 +285,16 @@ function AppShell() {
           mobileOpen={mobileOpen}
           handleDrawerToggle={handleDrawerToggle}
         />
+
         <Box
           component="main"
           sx={{
             flexGrow: 1,
-             ml: { lg: `240px` },
+            ml: { lg: navPadding() },
             p: 3,
           }}
         >
-          <Toolbar sx={{ display: { xs: "block", lg: "none" } }} />
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/" element={<Navigate to="/resources" replace />} />
-            <Route
-              path="/resources"
-              element={
-                <ProtectedRoute>
-                  <Resources />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/resources/:kind/:serviceId"
-              element={
-                <ProtectedRoute>
-                  <ResourceDetail />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/authenticators"
-              element={
-                <ProtectedRoute>
-                  <Authenticators />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/authenticators/:type/:name"
-              element={
-                <ProtectedRoute>
-                  <AuthenticatorDetails />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/policy/load"
-              element={
-                <ProtectedRoute>
-                  <PolicyLoad />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/login/callback" element={<OIDCCallback />} />
-            <Route
-              path="/authenticators/create"
-              element={
-                <ProtectedRoute>
-                  <AuthenticatorForm />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
+          <AppRoutes />
         </Box>
       </Box>
     </>
