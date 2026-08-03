@@ -1,29 +1,17 @@
 // React hooks for local component state and lifecycle side effects.
-import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 // MUI UI primitives used to build the page.
 import {
   Alert,
   Box,
   CircularProgress,
   Container,
+  Paper,
   Stack,
-  TextField,
   Typography,
   Divider,
   Grid,
 } from "@mui/material";
-
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import IconButton from "@mui/material/IconButton";
-import Tooltip from "@mui/material/Tooltip";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 
 import { resourcesService, authenticatorsService } from "../../services";
 

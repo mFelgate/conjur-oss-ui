@@ -9,8 +9,6 @@ import {
 import {
   AppBar,
   Toolbar,
-  Typography,
-  Button,
   Drawer,
   Box,
   List,
@@ -21,11 +19,7 @@ import {
 import { useState } from "react";
 
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
-import KeyOutlinedIcon from "@mui/icons-material/KeyOutlined";
-import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
-import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
-import LoginOutlinedIcon from "@mui/icons-material/LoginOutlined";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -157,7 +151,7 @@ function DrawerContent({ logout }) {
           <ListItemText primary="Resources" />
         </ListItemButton>
 
-        <ListItemButton component={Link} to="/resources?kind=variable">
+        {/* <ListItemButton component={Link} to="/resources?kind=variable">
           <KeyOutlinedIcon sx={{ mr: 2 }} />
           <ListItemText primary="Secrets" />
         </ListItemButton>
@@ -165,17 +159,17 @@ function DrawerContent({ logout }) {
         <ListItemButton component={Link} to="/resources?kind=group">
           <GroupOutlinedIcon sx={{ mr: 2 }} />
           <ListItemText primary="Groups" />
-        </ListItemButton>
+        </ListItemButton> */}
 
         <ListItemButton component={Link} to="/authenticators">
           <SecurityOutlinedIcon sx={{ mr: 2 }} />
           <ListItemText primary="Authenticators" />
         </ListItemButton>
-
+{/* 
         <ListItemButton component={Link} to="/resources?kind=policy">
           <DescriptionOutlinedIcon sx={{ mr: 2 }} />
           <ListItemText primary="Policy" />
-        </ListItemButton>
+        </ListItemButton> */}
 
         <ListItemButton component={Link} to="/policy/load">
           <CloudUploadIcon sx={{ mr: 2 }} />
@@ -246,7 +240,7 @@ function AppShell() {
   const handleDrawerToggle = () => {
     setMobileOpen((prev) => !prev);
   };
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated } = useAuth();
   const location = useLocation();
   const showNavbar = isAuthenticated && location.pathname !== "/login";
 

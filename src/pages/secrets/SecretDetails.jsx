@@ -1,28 +1,18 @@
-import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useState } from "react";
 import {
   Alert,
   Box,
   Button,
-  CircularProgress,
-  Container,
-  Divider,
   Paper,
   TextField,
   Stack,
   Typography,
 } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import IconButton from "@mui/material/IconButton";
-import Tooltip from "@mui/material/Tooltip";
-import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 
-import { secretsService, resourcesService } from "../../services";
-import { ResourceInfo, DetailRow } from "../resources/resourceDetails.jsx";
+import { secretsService } from "../../services";
 
 function formatValue(value) {
   if (typeof value === "string") {
@@ -178,10 +168,6 @@ export function SecretValueField({ resource }) {
 }
 
 export default function SecretDetails({ resource }) {
-  const [loading, setLoading] = useState(true);
-  const [secretPresent, setSecretPresent] = useState(false);
-  const [error, setError] = useState("");
-
   return (
     <Box sx={{ py: 4 }}>
         <Stack spacing={3}>

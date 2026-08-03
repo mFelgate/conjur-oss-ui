@@ -1,30 +1,13 @@
-import { useState, useRef } from "react";
 import {
   Alert,
   Box,
-  Button,
-  Container,
-  Paper,
   Stack,
-  List,
-  ListItem,
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  ListItemText,
-  Switch,
-  FormControlLabel,
-  TextField,
-  ToggleButton,
-  ToggleButtonGroup,
-  Divider,
   Typography,
 } from "@mui/material";
-import Editor from "@monaco-editor/react";
-import { configureMonacoYaml } from "monaco-yaml";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { policyService } from "../../services/policyService";
-import { ResourceInfo, DetailRow } from "../resources/resourceDetails.jsx";
 
 export default function PolicyUpdates({ UpdatedResources }) {
   const beforeItems = UpdatedResources?.before?.items ?? [];

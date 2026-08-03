@@ -9,11 +9,9 @@ import {
   Paper,
   Select,
   Alert,
-  Stack,
   TextField,
   Typography,
 } from "@mui/material";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import { authenticatorSchemas } from "./authenticatorSchema";
 import { authenticatorsService } from "../../services";
 
@@ -73,6 +71,23 @@ export default function CreateAuthenticator() {
     };
 
     try {
+      // Split flat "identity.foo" keys into a nested identity object
+      const identityPrefix = "identity.";
+      const identity = {};
+      const flatData = {};
+
+      for (const [key, value] of Object.entries(payload.data ?? {})) {
+        if (key.startsWith(identityPrefix)) {
+          identity[key.slice(identityPrefix.length)] = value;
+        } else {
+          flatData[key] = value;
+        }
+      }
+
+      if (Object.keys(identity).length > 0) {
+        flatData.identity = identity;
+      }
+      payload.data = flatData;
       if (
         payload.type === "jwt" &&
         typeof payload.data.public_keys === "string"

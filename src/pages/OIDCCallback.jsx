@@ -5,7 +5,6 @@ import { Box, CircularProgress, Typography, Alert } from "@mui/material";
 import { authService } from "../services/authService";
 
 export default function OIDCCallback() {
-  const TOKEN_STORAGE_KEY = 'conjur.accessToken'
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const { setAccessToken } = useAuth();
@@ -56,7 +55,7 @@ export default function OIDCCallback() {
     }
 
     authenticate();
-  }, [navigate]);
+  }, [navigate, setAccessToken]);
 
   if (error) {
     return (

@@ -1,27 +1,20 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
 import {
   Alert,
   Box,
   Button,
-  CircularProgress,
-  Container,
-  Divider,
-  Paper,
   Stack,
   Typography,
   TextField,
 } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 
-import { authenticatorsService, membershipsService } from "../../services";
+import { membershipsService } from "../../services";
 
 function AddMember({ serviceId, onMemberAdded }) {
   const [newMember, setNewMember] = useState("");

@@ -6,21 +6,15 @@ import {
   Container,
   Paper,
   Stack,
-  List,
-  ListItem,
-  ListItemText,
   Switch,
   FormControlLabel,
   TextField,
   ToggleButton,
   ToggleButtonGroup,
-  Divider,
   Typography,
 } from "@mui/material";
 import Editor from "@monaco-editor/react";
-import { configureMonacoYaml } from "monaco-yaml";
 import { policyService } from "../../services/policyService";
-import { ResourceInfo, DetailRow } from "../resources/resourceDetails.jsx";
 import PolicyResourceInfo from "./policyinfo.jsx";
 import PolicyUpdates from "./policyUpdates.jsx";
 

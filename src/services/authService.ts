@@ -2,7 +2,6 @@ import { apiRequest, apiRequestText } from "./apiClient";
 import type {
   AccessTokenResponse,
   ConjurAccessTokenRequest,
-  PasswordLoginRequest,
 } from "../types";
 import { CONJUR_ACCOUNT } from "../config";
 function toBase64(value: string): string {
@@ -29,19 +28,13 @@ function normalizeConjurToken(rawToken: string): string {
 }
 
 export const authService = {
-  getAccessToken(login: string, apiKey: string) {
-    const path = `/authn/${encodeURIComponent(CONJUR_ACCOUNT)}/${encodeURIComponent(login)}/authenticate`;
+  getAccessToken(account: string, login: string, apiKey: string) {
+    const path = `/authn/${encodeURIComponent(account)}/${encodeURIComponent(login)}/authenticate`;
 
     return apiRequestText(path, {
       method: "POST",
       body: apiKey,
-    }).then((rawToken) => {
-      const token = normalizeConjurToken(rawToken);
-
-      localStorage.setItem("conjur_access_token", token);
-
-      return token;
-    });
+    }).then((rawToken) => normalizeConjurToken(rawToken));
   },
 
   oidcLogin(
@@ -59,20 +52,17 @@ export const authService = {
         nonce,
         code_verifier: codeVerifier,
       },
-    }).then((rawToken) => {
-      const token = normalizeConjurToken(rawToken);
-      localStorage.setItem("conjur_access_token", token);
-
-      return token;
-    });
+    }).then((rawToken) => normalizeConjurToken(rawToken));
   },
 
   login(credentials: ConjurAccessTokenRequest) {
-    if (!CONJUR_ACCOUNT) {
+    const account = credentials.account || CONJUR_ACCOUNT;
+
+    if (!account) {
       throw new Error("Missing VITE_CONJUR_ACCOUNT. Set it in .env.local.");
     }
 
-    return authService.getAccessToken( credentials.login, credentials.apiKey);
+    return authService.getAccessToken(account, credentials.login, credentials.apiKey);
   },
 
   whoAmI() {

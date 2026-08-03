@@ -1,34 +1,18 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
 import {
   Alert,
   Box,
-  Button,
-  CircularProgress,
-  Container,
-  Divider,
   Paper,
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  TextField,
   Stack,
   Typography,
 } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import IconButton from "@mui/material/IconButton";
-import Tooltip from "@mui/material/Tooltip";
-import DeleteIcon from "@mui/icons-material/Delete";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import EditIcon from "@mui/icons-material/Edit";
-import CheckIcon from "@mui/icons-material/Check";
-import CloseIcon from "@mui/icons-material/Close";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import { resourcesService, policyService } from "../../services";
-import { ResourceInfo, DetailRow } from "../resources/resourceDetails.jsx";
+import { policyService } from "../../services";
 
 export default function PolicyDetails({ resource }) {
-  console.log("PolicyDetails resource:", resource);
   const [loading, setLoading] = useState(true);
   const [effectivePolicy, setEffectivePolicy] = useState(null);
   const [error, setError] = useState("");
@@ -44,7 +28,6 @@ export default function PolicyDetails({ resource }) {
 
       try {
         const policy = await policyService.getEffectivePolicy(serviceId);
-        console.log("Effective policy:", policy);
         setEffectivePolicy(policy);
       } catch (requestError) {
         if (isMounted) {

@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, Fragment } from "react";
+
 import { Link, useParams } from "react-router-dom";
 import {
   Alert,
@@ -6,31 +7,40 @@ import {
   Button,
   CircularProgress,
   Container,
-  Divider,
   Paper,
-  TextField,
   Stack,
   Typography,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import IconButton from "@mui/material/IconButton";
-import Tooltip from "@mui/material/Tooltip";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-import CheckIcon from "@mui/icons-material/Check";
-
-import CloseIcon from "@mui/icons-material/Close";
-import { ResourceInfo, DetailRow } from "../resources/resourceDetails.jsx";
-import VisibilityIcon from "@mui/icons-material/Visibility";
+import { DetailRow } from "../resources/resourceDetails.jsx";
 import { SecretValueField } from "../secrets/SecretDetails.jsx";
 
-import {
-  authenticatorsService,
-  membershipsService,
-  secretsService,
-} from "../../services";
+import { authenticatorsService } from "../../services";
 import MembershipGroups from "../members/memberGroup.jsx";
 
+
+function MapSecrets({ data, resource_id }) {
+  return (
+    <>
+      {Object.entries(data).map(([key, value]) =>
+        key === "identity" ? (
+          <MapSecrets key={key} data={value} resource_id={resource_id} />
+        ) : (
+          <Fragment key={key}>
+            <Typography variant="h6" component="h2">
+              {key}
+            </Typography>
+            <SecretValueField
+              resource={{
+                id: `account:variable:${resource_id}/${key.replaceAll("_", "-")}`,
+              }}
+            />
+          </Fragment>
+        )
+      )}
+    </>
+  );
+}
 
 export default function AuthenticatorDetails() {
   const { type, name } = useParams();
@@ -128,18 +138,7 @@ export default function AuthenticatorDetails() {
               <Stack spacing={1.5}>
                 {authenticator.data &&
                 Object.entries(authenticator.data).length > 0 ? (
-                  Object.entries(authenticator.data).map(([key, value]) => (
-                    <>
-                      <Typography variant="h6" component="h2">
-                        {key}
-                      </Typography>
-                      <SecretValueField
-                        resource={{
-                          id: `account:variable:${resource_id}/${key.replaceAll("_", "-")}`,
-                        }}
-                      />
-                    </>
-                  ))
+                    <MapSecrets data={authenticator.data} resource_id={resource_id} />
                 ) : (
                   <Typography variant="body2" color="text.secondary">
                     No config returned.

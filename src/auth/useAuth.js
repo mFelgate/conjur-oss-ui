@@ -11,10 +11,3 @@ export function useAuth() {
   return context
 }
 
-export const setAccessToken = (accessToken) => {
-  const normalizedToken = accessToken.trim();
-  setToken(normalizedToken);
-  localStorage.setItem(TOKEN_STORAGE_KEY, normalizedToken);
-  return normalizedToken;
-};
-

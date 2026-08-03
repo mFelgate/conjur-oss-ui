@@ -1,5 +1,5 @@
 // React hooks for local component state and lifecycle side effects.
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 // MUI UI primitives used to build the page.
 import {
@@ -68,7 +68,7 @@ function ResourceItem({ resource }) {
 }
 
 export default function Resources() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const [searchInput, setSearchInput] = useState("");
   const [filters, setFilters] = useState({
     type: searchParams.get("kind") ?? "",

@@ -1,26 +1,5 @@
-import { useState, useRef } from "react";
-import {
-  Alert,
-  Box,
-  Button,
-  Container,
-  Paper,
-  Stack,
-  List,
-  ListItem,
-  ListItemText,
-  Switch,
-  FormControlLabel,
-  TextField,
-  ToggleButton,
-  ToggleButtonGroup,
-  Divider,
-  Typography,
-} from "@mui/material";
-import Editor from "@monaco-editor/react";
-import { configureMonacoYaml } from "monaco-yaml";
-import { policyService } from "../../services/policyService";
-import { ResourceInfo, DetailRow } from "../resources/resourceDetails.jsx";
+import { Stack, Typography } from "@mui/material";
+import { DetailRow } from "../resources/resourceDetails.jsx";
 
 export default function PolicyResourceInfo({ title, resource }) {
   return (

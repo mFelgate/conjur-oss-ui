@@ -16,7 +16,6 @@ import { authenticatorsService } from "../services";
 export default function Login() {
   const { login, loading, error } = useAuth();
   const navigate = useNavigate();
-  const [localLoading, setLocalLoading] = useState(false);
   const [loginName, setLoginName] = useState("");
   const [apiKey, setApiKey] = useState("");
   const [localError, setLocalError] = useState("");
@@ -62,10 +61,7 @@ export default function Login() {
           );
         }
       } finally {
-        // Always clear loading after request finishes.
-        if (isMounted) {
-          setLocalLoading(false);
-        }
+        // Auth loading is managed by AuthContext.
       }
     }
     loadProvider();
@@ -104,8 +100,8 @@ export default function Login() {
               {(localError || error) && (
                 <Alert severity="error">{localError || error}</Alert>
               )}
-              <Button type="submit" variant="contained" disabled={localLoading}>
-                {localLoading ? "Signing in..." : "Sign in"}
+              <Button type="submit" variant="contained" disabled={loading}>
+                {loading ? "Signing in..." : "Sign in"}
               </Button>
 
               <Stack spacing={1}>
@@ -113,13 +109,13 @@ export default function Login() {
                 {providers.length > 0 ? (
                   providers.map((provider) => (
                     <Button
-                      disabled={localLoading}
+                      disabled={loading}
                       onClick={() => handleOIDCLogin(provider)}
                       variant="contained"
                       fullWidth
                     >
                       {" "}
-                      {localLoading
+                      {loading
                         ? "Signing in..."
                         : `Sign in with ${provider.name}`}
                     </Button>

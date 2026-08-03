@@ -1,4 +1,4 @@
-import { API_BASE_URL, CONJUR_ACCOUNT } from "../config";
+import { API_BASE_URL } from "../config";
 
 
 export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
@@ -7,6 +7,7 @@ interface RequestOptions {
   method?: HttpMethod;
   query?: object;
   headers?: Record<string, string>;
+  dryRun?: boolean;
 }
 
 export interface PolicyErrorResponse {
@@ -161,8 +162,15 @@ export async function apiRequestText(
     }
 
     if (!response.ok) {
-      const message = await response.json();
-      const apiError = JSON.parse(message) as ApiErrorResponse;
+      const message = await response.text();
+      let apiError: ApiErrorResponse | string = message;
+
+      try {
+        apiError = JSON.parse(message) as ApiErrorResponse;
+      } catch {
+        // keep plain text fallback
+      }
+
       throw new ApiError(apiError, response.status);
     }
 

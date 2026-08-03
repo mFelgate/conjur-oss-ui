@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Alert,
@@ -10,7 +10,6 @@ import {
   MenuItem,
   Stack,
   TablePagination,
-  TextField,
   Typography,
 } from "@mui/material";
 import { authenticatorsService } from "../../services";
