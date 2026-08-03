@@ -95,46 +95,11 @@ export default function Authenticators() {
   // Controlled input value for search text.
 
   function handleTypeChange(event) {
+    setLoading(true);
+    setError("");
     setAuthType(event.target.value);
     setPage(0);
   }
-
-
-  async function loadAuthenticators(isMounted) {
-      // Request started: set loading true and clear previous error.
-      setLoading(true);
-      setError("");
-
-      try {
-        // Service call returns a Promise.
-        // Service normalizes the endpoint's supported response shapes into an array.
-        const response = await authenticatorsService.list({
-          offset: page * rowsPerPage,
-          limit: rowsPerPage,
-          type: authType || undefined,
-        });
-
-        // Only update state if component still exists.
-        if (isMounted) {
-          setAuthenticators(response.authenticators);
-          setCount(response.count);
-        }
-      } catch (requestError) {
-        // Normalize unknown error into a readable string.
-        if (isMounted) {
-          setError(
-            requestError instanceof Error
-              ? requestError.message
-              : "Failed to load authenticators.",
-          );
-        }
-      } finally {
-        // Always clear loading after request finishes.
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    }
 
   async function handleToggleAuthenticator(authenticator, checked) {
     try {
@@ -163,7 +128,16 @@ export default function Authenticators() {
         authenticator.type,
         authenticator.name,
       );
-      loadAuthenticators(true);
+      setAuthenticators((currentAuthenticators) =>
+        currentAuthenticators.filter(
+          (currentAuthenticator) =>
+            !(
+              currentAuthenticator.type === authenticator.type &&
+              currentAuthenticator.name === authenticator.name
+            ),
+        ),
+      );
+      setCount((currentCount) => Math.max(0, currentCount - 1));
 
     } catch (error) {
       setError(error instanceof Error ? error.message : "Update failed.");
@@ -174,7 +148,35 @@ export default function Authenticators() {
   useEffect(() => {
     // Prevents state updates if component unmounts before request completes.
     let isMounted = true;
-    loadAuthenticators(isMounted);
+    async function loadAuthenticators() {
+      try {
+        const response = await authenticatorsService.list({
+          offset: page * rowsPerPage,
+          limit: rowsPerPage,
+          type: authType || undefined,
+        });
+
+        if (isMounted) {
+          setAuthenticators(response.authenticators);
+          setCount(response.count);
+          setError("");
+        }
+      } catch (requestError) {
+        if (isMounted) {
+          setError(
+            requestError instanceof Error
+              ? requestError.message
+              : "Failed to load authenticators.",
+          );
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadAuthenticators();
 
     // Cleanup runs on unmount.
     return () => {
@@ -243,10 +245,14 @@ export default function Authenticators() {
                 count={count}
                 page={page}
                 onPageChange={(event, newPage) => {
+                  setLoading(true);
+                  setError("");
                   setPage(newPage);
                 }}
                 rowsPerPage={rowsPerPage}
                 onRowsPerPageChange={(event) => {
+                  setLoading(true);
+                  setError("");
                   setRowsPerPage(parseInt(event.target.value, 10));
                   setPage(0);
                 }}

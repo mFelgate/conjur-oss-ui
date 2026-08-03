@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { authService } from '../services'
 import { AuthContext } from './authContextStore'
 
@@ -11,14 +11,14 @@ export function AuthProvider({ children }) {
   const [error, setError] = useState('')
 
 
-  const setAccessToken = (accessToken) => {
+  const setAccessToken = useCallback((accessToken) => {
     const normalizedToken = accessToken.trim();
     setToken(normalizedToken);
     localStorage.setItem(TOKEN_STORAGE_KEY, normalizedToken);
     return normalizedToken;
-  };
+  }, []);
 
-  const login = async (credentials) => {
+  const login = useCallback(async (credentials) => {
     setLoading(true)
     setError('')
 
@@ -32,13 +32,13 @@ export function AuthProvider({ children }) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [setAccessToken])
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setToken('')
     localStorage.removeItem(TOKEN_STORAGE_KEY)
     localStorage.removeItem('conjur.account')
-  }
+  }, [])
 
   const value = useMemo(
     () => ({
@@ -50,7 +50,7 @@ export function AuthProvider({ children }) {
       logout,
       setAccessToken,
     }),
-    [token, loading, error],
+    [token, loading, error, login, logout, setAccessToken],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

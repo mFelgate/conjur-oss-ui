@@ -45,12 +45,9 @@ function MapSecrets({ data, resource_id }) {
 export default function AuthenticatorDetails() {
   const { type, name } = useParams();
   const [authenticator, setAuthenticator] = useState(null);
-  const [appsMembers, setAppsMembers] = useState(null);
-  const [operatorMembers, setOperatorMembers] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const resource_id = `conjur/authn-${type}/${name}`;
-  const [resource, setResource] = useState(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -107,7 +104,7 @@ export default function AuthenticatorDetails() {
             </Stack>
           )}
 
-          {!loading && error && <Alert severity="error">{error.message}</Alert>}
+          {!loading && error && <Alert severity="error">{error}</Alert>}
 
           {!loading && !error && authenticator && (
             <>

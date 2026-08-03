@@ -87,7 +87,7 @@ export function SecretValueField({ resource }) {
 
   const saveSecret = async (serviceId) => {
     try {
-      const response = await secretsService.set(kind, serviceId, editedValue);
+      await secretsService.set(kind, serviceId, editedValue);
 
       cancelEdit();
     } catch (error) {

@@ -70,10 +70,10 @@ function ResourceItem({ resource }) {
 export default function Resources() {
   const [searchParams] = useSearchParams();
   const [searchInput, setSearchInput] = useState("");
-  const [filters, setFilters] = useState({
-    type: searchParams.get("kind") ?? "",
-    search: "",
-  });
+  const [selectedType, setSelectedType] = useState(
+    () => searchParams.get("kind") ?? "",
+  );
+  const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [count, setCount] = useState(0);
@@ -88,10 +88,7 @@ export default function Resources() {
   const [error, setError] = useState("");
 
   function handleTypeChange(event) {
-    setFilters((prev) => ({
-      ...prev,
-      type: event.target.value,
-    }));
+    setSelectedType(event.target.value);
     setPage(0);
   }
 
@@ -113,15 +110,15 @@ export default function Resources() {
         // - { items: Resource[] }
         // - { resources: Resource[] }
         const response = await resourcesService.list({
-          kind: filters.type || undefined,
-          search: filters.search || undefined,
+          kind: selectedType || undefined,
+          search: searchTerm || undefined,
           offset: page * rowsPerPage,
           limit: rowsPerPage,
         });
 
         const countRespons = await resourcesService.list({
-          kind: filters.type || undefined,
-          search: filters.search || undefined,
+          kind: selectedType || undefined,
+          search: searchTerm || undefined,
           count: true,
         });
 
@@ -154,15 +151,7 @@ export default function Resources() {
     return () => {
       isMounted = false;
     };
-  }, [filters.type, filters.search, page, rowsPerPage]);
-
-  useEffect(() => {
-    setFilters((prev) => ({
-      ...prev,
-      type: searchParams.get("kind") ?? "",
-    }));
-    setPage(0);
-  }, [searchParams]);
+  }, [selectedType, searchTerm, page, rowsPerPage]);
 
   return (
     // Outer page spacing wrapper.
@@ -199,7 +188,7 @@ export default function Resources() {
             />
 
             <Select
-              value={filters.type || ""}
+              value={selectedType || ""}
               onChange={handleTypeChange}
               displayEmpty
             >
@@ -214,12 +203,7 @@ export default function Resources() {
             </Select>
 
             <Button
-              onClick={() =>
-                setFilters((prev) => ({
-                  ...prev,
-                  search: searchInput,
-                }))
-              }
+              onClick={() => setSearchTerm(searchInput)}
             >
               Search
             </Button>

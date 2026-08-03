@@ -237,7 +237,7 @@ export default function Dashboard() {
           </Typography>
           <Divider sx={{ mb: 2 }} />
           <Grid container spacing={1} sx={{ mb: 2 }}>
-            {Object.keys(resourceTypes()).map((key, value) => (
+            {Object.keys(resourceTypes()).map((key) => (
               <Grid item xs={12} sm={6} md={4} key={key}>
                 <ResourceCount title={resourceTypes()[key]} type={key} />
               </Grid>

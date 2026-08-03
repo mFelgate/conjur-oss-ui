@@ -39,7 +39,7 @@ export default function Login() {
     sessionStorage.setItem("oidc_nonce", provider.nonce);
     sessionStorage.setItem("oidc_code_verifier", provider.code_verifier);
     sessionStorage.setItem("oidc_service_id", provider.service_id);
-    window.location.href = provider.redirect_uri;
+    window.location.assign(provider.redirect_uri);
   };
 
   useEffect(() => {
@@ -109,6 +109,7 @@ export default function Login() {
                 {providers.length > 0 ? (
                   providers.map((provider) => (
                     <Button
+                      key={provider.service_id ?? provider.name}
                       disabled={loading}
                       onClick={() => handleOIDCLogin(provider)}
                       variant="contained"

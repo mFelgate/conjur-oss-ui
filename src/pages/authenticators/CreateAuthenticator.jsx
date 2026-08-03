@@ -48,7 +48,6 @@ export default function CreateAuthenticator() {
   });
 
   const [error, setError] = useState(null);
-  const [createdAuthenticator, setCreatedAuthenticator] = useState(null);
   function updateData(key, value) {
     setForm((previous) => ({
       ...previous,
@@ -96,7 +95,6 @@ export default function CreateAuthenticator() {
       }
       const response = await authenticatorsService.create(payload);
       setError(null);
-      setCreatedAuthenticator(response);
 
       navigate(`/authenticators/${response.type}/${response.name}`);
     } catch (error) {

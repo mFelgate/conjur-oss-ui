@@ -17,12 +17,11 @@ import CloseIcon from "@mui/icons-material/Close";
 import { membershipsService } from "../../services";
 
 function AddMember({ serviceId, onMemberAdded }) {
-  const [newMember, setNewMember] = useState("");
   const [editing, setEditing] = useState(false);
   const [error, setError] = useState("");
   const [editedValue, setEditedValue] = useState("");
 
-  const startEdit = async (currentValue) => {
+  const startEdit = async () => {
     setEditing(true);
     setEditedValue("");
   };
@@ -35,7 +34,7 @@ function AddMember({ serviceId, onMemberAdded }) {
 
   const addMember = async (serviceId) => {
     try {
-      const response = await membershipsService.addMember(
+      await membershipsService.addMember(
         "group",
         serviceId,
         editedValue,
@@ -102,7 +101,7 @@ function AddMember({ serviceId, onMemberAdded }) {
         />
       ) : (
         <Typography variant="body2" color="text.secondary">
-          {newMember}
+          Add a member to this group.
         </Typography>
       )}
     </Stack>
@@ -113,7 +112,7 @@ export default function MembershipGroups({ serviceId }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [members, setMembers] = useState([]);
-  async function handleDeleteMember(member, isMounted) {
+  async function handleDeleteMember(member) {
     try {
       await membershipsService.removeMember("group", `${serviceId}`, member);
       loadMembers(serviceId, true);
