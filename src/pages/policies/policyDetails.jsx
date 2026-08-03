@@ -28,7 +28,9 @@ export default function PolicyDetails({ resource }) {
 
       try {
         const policy = await policyService.getEffectivePolicy(serviceId);
-        setEffectivePolicy(policy);
+        if (isMounted) {
+          setEffectivePolicy(policy);
+        }
       } catch (requestError) {
         if (isMounted) {
           setError(
@@ -54,6 +56,9 @@ export default function PolicyDetails({ resource }) {
   return (
     <Box sx={{ py: 4 }}>
       <Stack spacing={3}>
+        {loading && <Alert severity="info">Loading policy...</Alert>}
+        {!loading && error && <Alert severity="error">{error}</Alert>}
+
         <Paper variant="outlined" sx={{ p: 2 }}>
           <Stack spacing={1.5}>
             <Typography variant="h6" component="h2">
@@ -90,14 +95,14 @@ export default function PolicyDetails({ resource }) {
           </Stack>
         </Paper>
 
-        {resource.policy_versions.length > 0 && (
+        {resource.policy_versions?.length > 0 && (
           <Paper variant="outlined" sx={{ p: 2 }}>
             <Typography variant="h6" gutterBottom>
               Policy History
             </Typography>
 
             <Stack spacing={1}>
-              {resource.policy_versions.map((policy) => (
+              {resource.policy_versions?.map((policy) => (
                 <Accordion key={policy.version} variant="outlined">
                   <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                     <Typography>

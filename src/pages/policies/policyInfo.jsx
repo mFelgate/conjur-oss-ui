@@ -5,6 +5,9 @@ export default function PolicyResourceInfo({ title, resource }) {
   return (
     <Stack spacing={1.5}>
       <Typography variant="h6" color="text.secondary">
+        {title}
+      </Typography>
+      <Typography variant="h6" color="text.secondary">
         {resource.identifier}
       </Typography>
       <DetailRow label="Name" value={resource.id} />

@@ -26,7 +26,6 @@ export default function PolicyLoad() {
   const [responseStatus, setResponseStatus] = useState(null);
   const [createdItems, setCreatedItems] = useState([]);
   const [deletedItems, setDeletedItems] = useState([]);
-  const [updatedItems, setUpdatedItems] = useState([]);
   const [branch, setBranch] = useState("root");
   const [error, setError] = useState("");
   const [method, setMethod] = useState("POST");
@@ -56,11 +55,6 @@ export default function PolicyLoad() {
     );
   };
 
-  const handleUpdate = (value) => {
-    clearErrors;
-    setPolicyText(value ?? "");
-  };
-
   const showErrors = (errors) => {
     const monaco = monacoRef.current;
     const editor = editorRef.current;
@@ -70,7 +64,7 @@ export default function PolicyLoad() {
     const model = editor.getModel();
     if (!model) return;
 
-    const errorDecorations = errors.response?.errors.map((error) => ({
+    const errorDecorations = (errors.response?.errors ?? []).map((error) => ({
       range: new monaco.Range(error.line, 1, error.line, 1),
       options: {
         isWholeLine: true,
@@ -83,7 +77,7 @@ export default function PolicyLoad() {
       errorDecorations,
     );
 
-    const markers = errors.response?.errors.map((error) => ({
+    const markers = (errors.response?.errors ?? []).map((error) => ({
       startLineNumber: error.line,
       startColumn: error.column,
       endLineNumber: error.line,
@@ -114,7 +108,6 @@ export default function PolicyLoad() {
       if (dryRun) {
         setCreatedItems(response.data.created?.items ?? []);
         setDeletedItems(response.data.deleted?.items ?? []);
-        setUpdatedItems(response.data.updated?.items ?? []);
       }
     } catch (err) {
       if (dryRun) {
@@ -193,10 +186,9 @@ export default function PolicyLoad() {
             </Stack>
           </Paper>
 
-          {!error && policyResponse && responseStatus == "200" && (
+          {!error && policyResponse && responseStatus === 200 && (
             <Stack spacing={2}>
-              {!createdItems ||
-                (createdItems.length != 0 && (
+              {createdItems.length > 0 && (
                   <>
                     <Typography variant="h6" sx={{ mt: 1 }}>
                       Resource to Be Created
@@ -217,10 +209,9 @@ export default function PolicyLoad() {
                       ))}
                     </Stack>
                   </>
-                ))}
+                )}
 
-              {!deletedItems ||
-                (deletedItems.length != 0 && (
+              {deletedItems.length > 0 && (
                   <>
                     <Typography variant="h6" sx={{ mt: 1 }}>
                       Resource to Be Deleted
@@ -241,7 +232,7 @@ export default function PolicyLoad() {
                       ))}
                     </Stack>
                   </>
-                ))}
+                )}
 
               <Typography variant="h6" sx={{ mt: 1 }}>
                 Resource To Be Updated

@@ -59,7 +59,7 @@ export default function PolicyUpdates({ UpdatedResources }) {
   function RenderChanges(changes, Type) {
     return (
       <>
-        <Typography variant="h8" color="text.secondary">
+        <Typography variant="subtitle2" color="text.secondary">
           {Type}
         </Typography>
         {changes.added.map((item) => (
@@ -85,7 +85,7 @@ export default function PolicyUpdates({ UpdatedResources }) {
   function RenderObjectChanges(changes, Type) {
     return (
       <>
-        <Typography variant="h8" color="text.secondary">
+        <Typography variant="subtitle2" color="text.secondary">
           {Type}
         </Typography>
 
@@ -113,8 +113,10 @@ export default function PolicyUpdates({ UpdatedResources }) {
 
   return (
     <Stack spacing={1}>
-      {beforeItems.map((beforeItem, index) => {
-        const afterItem = afterItems[index];
+      {beforeItems.map((beforeItem) => {
+        const afterItem =
+          afterItems.find((item) => item.identifier === beforeItem.identifier) ??
+          {};
         const membersChange = arrayChanged(
           beforeItem.members,
           afterItem.members,
@@ -128,8 +130,8 @@ export default function PolicyUpdates({ UpdatedResources }) {
           afterItem.annotations,
         );
         const restrictionsChange = arrayChanged(
-          beforeItem.restrictions,
-          afterItem.restrictions,
+          beforeItem.restricted_to,
+          afterItem.restricted_to,
         );
         const permissionChanges = objectChanged(
           beforeItem.permissions,
