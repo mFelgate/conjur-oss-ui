@@ -108,6 +108,16 @@ The Conjur backend should be started using the official Conjur development instr
 
 https://github.com/cyberark/conjur/blob/master/CONTRIBUTING.md
 
+### Start the UI container from repo root
+
+You can start the UI container and provide a deployment-specific Conjur account and API URI:
+
+```bash
+./start.sh --account cucumber --conjur-uri http://conjur:3000
+```
+
+For local OIDC/Keycloak profile startup, use the development workflow in [dev/README.md](dev/README.md).
+
 ## Screenshots
 
 ### Authentication

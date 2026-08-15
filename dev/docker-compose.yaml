@@ -10,8 +10,8 @@ services:
       - ..:/app
       - /app/node_modules
     environment:
-      - VITE_CONJUR_URL=http://conjur:3000
-      - VITE_CONJUR_ACCOUNT=cucumber
+      - VITE_CONJUR_URL=${VITE_CONJUR_URL:-http://conjur:3000}
+      - VITE_CONJUR_ACCOUNT=${VITE_CONJUR_ACCOUNT:-cucumber}
       - CHOKIDAR_USEPOLLING=true
     networks:
       - conjur-dev_default

@@ -56,7 +56,7 @@ export const authService = {
   },
 
   login(credentials: ConjurAccessTokenRequest) {
-    const account = credentials.account || CONJUR_ACCOUNT;
+    const account = CONJUR_ACCOUNT;
 
     if (!account) {
       throw new Error("Missing VITE_CONJUR_ACCOUNT. Set it in .env.local.");

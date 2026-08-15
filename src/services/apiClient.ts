@@ -1,7 +1,7 @@
 import { API_BASE_URL } from "../config";
 
 
-export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
+export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 interface RequestOptions {
   method?: HttpMethod;

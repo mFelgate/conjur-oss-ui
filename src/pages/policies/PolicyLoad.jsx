@@ -17,6 +17,27 @@ import Editor from "@monaco-editor/react";
 import { policyService } from "../../services/policyService";
 import PolicyUpdates from "./policyUpdates.jsx";
 
+function PolicyDryRunResourceInfo({ title, resource }) {
+  return (
+    <Stack spacing={0.5}>
+      <Typography variant="subtitle2">{title}</Typography>
+      <Typography variant="body2">
+        <strong>ID:</strong> {resource?.id}
+      </Typography>
+      {resource?.kind && (
+        <Typography variant="body2">
+          <strong>Kind:</strong> {resource.kind}
+        </Typography>
+      )}
+      {resource?.branch && (
+        <Typography variant="body2">
+          <strong>Branch:</strong> {resource.branch}
+        </Typography>
+      )}
+    </Stack>
+  );
+}
+
 export default function PolicyLoad() {
   const [policyText, setPolicyText] = useState("");
   const [dryRun, setDryRun] = useState(true);
@@ -193,7 +214,7 @@ export default function PolicyLoad() {
                           variant="outlined"
                           sx={{ p: 2 }}
                         >
-                          <PolicyResourceInfo
+                          <PolicyDryRunResourceInfo
                             key={resource.id}
                             title="Created Resource"
                             resource={resource}
@@ -216,7 +237,7 @@ export default function PolicyLoad() {
                           variant="outlined"
                           sx={{ p: 2 }}
                         >
-                          <PolicyResourceInfo
+                          <PolicyDryRunResourceInfo
                             key={resource.id}
                             title="Deleted Resource"
                             resource={resource}

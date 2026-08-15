@@ -213,9 +213,9 @@ export default function Dashboard() {
         GCP: "gcp",
         JWT: "jwt",
         Kubernetes: "k8s",
-        AWS: "iam",
+      AWS: "aws",
         Azure: "azure",
-        Certificate: "cert",
+      Certificate: "certificate",
         };
     };
 

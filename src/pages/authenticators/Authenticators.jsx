@@ -220,7 +220,7 @@ export default function Authenticators() {
               <MenuItem value="azure">Azure</MenuItem>
               <MenuItem value="ldap">LDAP</MenuItem>
               <MenuItem value="gcp">GCP</MenuItem>
-              <MenuItem value="cert">Certificate</MenuItem>
+              <MenuItem value="certificate">Certificate</MenuItem>
               <MenuItem value="jwt">JWT</MenuItem>
               <MenuItem value="k8s">K8s</MenuItem>
             </Select>

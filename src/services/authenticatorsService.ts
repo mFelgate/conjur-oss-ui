@@ -1,8 +1,11 @@
 import { apiRequest } from './apiClient'
 import type {
+  AuthenticatorType,
   AuthenticatorV2Response,
-  AuthenticatorsV2ListResponse,
+  CreateAuthenticatorV2Request,
+  AuthenticatorsV2ListEnvelopeResponse,
   ListAuthenticatorsV2QueryRequest,
+  ProvidersListResponse,
 } from '../types'
 import { CONJUR_ACCOUNT } from "../config";
 const RootPath = `/authenticators/${encodeURIComponent(CONJUR_ACCOUNT)}`;
@@ -11,7 +14,7 @@ const RootPath = `/authenticators/${encodeURIComponent(CONJUR_ACCOUNT)}`;
 export const authenticatorsService = {
   providers() {
     const path = `/authn-oidc/cucumber/providers`
-    return apiRequest<ProviderResponse>(path, {
+    return apiRequest<ProvidersListResponse>(path, {
       headers: {
         accept: 'application/x.secretsmgr.v2beta+json',
       },
@@ -25,7 +28,7 @@ export const authenticatorsService = {
       },
     })
   },  
-  get(type, service_id) {
+  get(type: AuthenticatorType, service_id: string) {
     const path = `${RootPath}/${encodeURIComponent(type)}/${encodeURIComponent(service_id)}`
     return apiRequest<AuthenticatorV2Response>(path, {
       headers: {
@@ -33,7 +36,7 @@ export const authenticatorsService = {
       },
     })
   },
-  update(enablement, type, service_id) {
+  update(enablement: boolean, type: AuthenticatorType, service_id: string) {
     const path = `${RootPath}/${encodeURIComponent(type)}/${encodeURIComponent(service_id)}`
     return apiRequest<AuthenticatorV2Response>(path , {
 			method: 'PATCH',
@@ -45,7 +48,7 @@ export const authenticatorsService = {
     	},
     },)
 	},  
-	delete(type, service_id) {
+	delete(type: AuthenticatorType, service_id: string) {
     const path = `${RootPath}/${encodeURIComponent(type)}/${encodeURIComponent(service_id)}`
     return apiRequest<void>(path , {
 			method: 'DELETE',
@@ -53,7 +56,7 @@ export const authenticatorsService = {
         accept: 'application/x.secretsmgr.v2beta+json',
       },
     },)
-	}, create(authenticator) {
+	}, create(authenticator: CreateAuthenticatorV2Request) {
     const path = `${RootPath}`
     return apiRequest<AuthenticatorV2Response>(path , {
 			method: 'POST',
