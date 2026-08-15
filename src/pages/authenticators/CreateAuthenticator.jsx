@@ -66,7 +66,7 @@ export default function CreateAuthenticator() {
       name: form.name,
       enabled: form.enabled,
       annotations: form.annotations,
-      ...(Object.keys(form.data).length > 0 && { data: form.data }),
+      ...(Object.keys(form.data)?.length > 0 && { data: form.data }),
     };
 
     try {
@@ -77,13 +77,13 @@ export default function CreateAuthenticator() {
 
       for (const [key, value] of Object.entries(payload.data ?? {})) {
         if (key.startsWith(identityPrefix)) {
-          identity[key.slice(identityPrefix.length)] = value;
+          identity[key.slice(identityPrefix?.length)] = value;
         } else {
           flatData[key] = value;
         }
       }
 
-      if (Object.keys(identity).length > 0) {
+      if (Object.keys(identity)?.length > 0) {
         flatData.identity = identity;
       }
       payload.data = flatData;

@@ -43,8 +43,8 @@ export default function PolicyUpdates({ UpdatedResources }) {
       ) {
         const diff = arrayChanged(beforeObj[key], afterObj[key]);
 
-        if (diff.added.length) added[key] = diff.added;
-        if (diff.removed.length) removed[key] = diff.removed;
+        if (diff.added?.length) added[key] = diff.added;
+        if (diff.removed?.length) removed[key] = diff.removed;
       } else if (
         JSON.stringify(beforeObj[key]) !== JSON.stringify(afterObj[key])
       ) {
@@ -107,7 +107,7 @@ export default function PolicyUpdates({ UpdatedResources }) {
     );
   }
 
-  if (beforeItems.length === 0) {
+  if (beforeItems?.length === 0) {
     return <Alert severity="info">No resources will be updated.</Alert>;
   }
 
@@ -151,27 +151,27 @@ export default function PolicyUpdates({ UpdatedResources }) {
             </AccordionSummary>
 
             <AccordionDetails>
-              {membersChange.added.length > 0 ||
-              membersChange.removed.length > 0
+              {membersChange.added?.length > 0 ||
+              membersChange.removed?.length > 0
                 ? RenderChanges(membersChange, "Members")
                 : null}
-              {memberships.added.length > 0 || memberships.removed.length > 0
+              {memberships.added?.length > 0 || memberships.removed?.length > 0
                 ? RenderChanges(memberships, "Memberships")
                 : null}
-              {Object.keys(annotationsChange.added).length > 0 ||
-              Object.keys(annotationsChange.removed).length > 0
+              {Object.keys(annotationsChange.added)?.length > 0 ||
+              Object.keys(annotationsChange.removed)?.length > 0
                 ? RenderObjectChanges(annotationsChange, "Annotations")
                 : null}
-              {restrictionsChange.added.length > 0 ||
-              restrictionsChange.removed.length > 0
+              {restrictionsChange.added?.length > 0 ||
+              restrictionsChange.removed?.length > 0
                 ? RenderChanges(restrictionsChange, "Restrictions")
                 : null}
-              {Object.keys(permissionChanges.added).length > 0 ||
-              Object.keys(permissionChanges.removed).length > 0
+              {Object.keys(permissionChanges.added)?.length > 0 ||
+              Object.keys(permissionChanges.removed)?.length > 0
                 ? RenderObjectChanges(permissionChanges, "Permissions")
                 : null}
-              {Object.keys(permittedChanges.added).length > 0 ||
-              Object.keys(permittedChanges.removed).length > 0
+              {Object.keys(permittedChanges.added)?.length > 0 ||
+              Object.keys(permittedChanges.removed)?.length > 0
                 ? RenderObjectChanges(permittedChanges, "Permitted")
                 : null}
             </AccordionDetails>

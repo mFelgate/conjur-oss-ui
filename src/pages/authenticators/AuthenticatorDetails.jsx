@@ -134,7 +134,7 @@ export default function AuthenticatorDetails() {
 
               <Stack spacing={1.5}>
                 {authenticator.data &&
-                Object.entries(authenticator.data).length > 0 ? (
+                Object.entries(authenticator.data)?.length > 0 ? (
                     <MapSecrets data={authenticator.data} resource_id={resource_id} />
                 ) : (
                   <Typography variant="body2" color="text.secondary">

@@ -172,7 +172,7 @@ export default function SecretDetails({ resource }) {
     <Box sx={{ py: 4 }}>
         <Stack spacing={3}>
 
-          { resource?.secrets.length === 0 && (
+          { resource?.secrets?.length === 0 && (
             <>
               <Alert severity="info">Secret not found.</Alert>
               <AddSecretField
@@ -181,7 +181,7 @@ export default function SecretDetails({ resource }) {
             </>
           )}
 
-        { resource?.secrets.length > 0 && (
+        { resource?.secrets?.length > 0 && (
             <>
               <SecretValueField resource={resource} />
             </>

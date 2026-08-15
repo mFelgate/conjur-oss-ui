@@ -106,7 +106,7 @@ export default function Login() {
 
               <Stack spacing={1}>
                 <Typography variant="h6">Available Providers</Typography>
-                {providers.length > 0 ? (
+                {providers?.length > 0 ? (
                   providers.map((provider) => (
                     <Button
                       key={provider.service_id ?? provider.name}

@@ -234,11 +234,11 @@ export default function Authenticators() {
 
           {!loading && error && <Alert severity="error">{error}</Alert>}
 
-          {!loading && !error && authenticators.length === 0 && (
+          {!loading && !error && authenticators?.length === 0 && (
             <Alert severity="info">No authenticators returned by API.</Alert>
           )}
 
-          {!loading && !error && authenticators.length > 0 && (
+          {!loading && !error && authenticators?.length > 0 && (
             <TableContainer component={Paper}>
               <TablePagination
                 component="div"

@@ -169,7 +169,7 @@ export default function MembershipGroups({ serviceId }) {
         <Alert severity="info">No members found.</Alert>
       )}
 
-      {members && members.length > 0 && (
+      {members && members?.length > 0 && (
         <Stack spacing={1.5}>
           {members.map((member) => (
             <Stack

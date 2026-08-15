@@ -15,7 +15,6 @@ import {
 } from "@mui/material";
 import Editor from "@monaco-editor/react";
 import { policyService } from "../../services/policyService";
-import PolicyResourceInfo from "./policyinfo.jsx";
 import PolicyUpdates from "./policyUpdates.jsx";
 
 export default function PolicyLoad() {
@@ -132,12 +131,6 @@ export default function PolicyLoad() {
             placeholder="Type branch name"
             fullWidth
           />
-
-          <Alert severity="info">
-            Paste a Conjur policy below. Enable Dry Run to validate the policy
-            before applying it.
-          </Alert>
-
           <Paper variant="outlined" sx={{ p: 2 }}>
             <Stack spacing={2}>
               <Stack direction="row" spacing={2} alignItems="center">
@@ -188,7 +181,7 @@ export default function PolicyLoad() {
 
           {!error && policyResponse && responseStatus === 200 && (
             <Stack spacing={2}>
-              {createdItems.length > 0 && (
+              {createdItems?.length > 0 && (
                   <>
                     <Typography variant="h6" sx={{ mt: 1 }}>
                       Resource to Be Created
@@ -211,7 +204,7 @@ export default function PolicyLoad() {
                   </>
                 )}
 
-              {deletedItems.length > 0 && (
+              {deletedItems?.length > 0 && (
                   <>
                     <Typography variant="h6" sx={{ mt: 1 }}>
                       Resource to Be Deleted

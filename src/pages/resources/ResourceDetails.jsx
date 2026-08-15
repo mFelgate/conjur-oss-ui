@@ -51,7 +51,7 @@ export function ResourceInfo({ title, resource }) {
       </Stack>
     </Paper>
 
- {resource.annotations.length > 0 && (
+ {resource.annotations?.length > 0 && (
     <Paper variant="outlined" sx={{ p: 2 }}>
       <Stack spacing={1}>
         <Typography variant="h6" color="text.secondary">
@@ -71,7 +71,7 @@ export function ResourceInfo({ title, resource }) {
       </Stack>
     </Paper>)}
 
- {resource.permissions.length > 0 && (
+ {resource.permissions?.length > 0 && (
     <Paper variant="outlined" sx={{ p: 2 }}>
       <Stack spacing={1}>
         <Typography variant="h6" color="text.secondary">

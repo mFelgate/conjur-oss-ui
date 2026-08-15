@@ -221,12 +221,12 @@ export default function Resources() {
           {!loading && error && <Alert severity="error">{error}</Alert>}
 
           {/* Empty state (no data returned) */}
-          {!loading && !error && resources.length === 0 && (
+          {!loading && !error && resources?.length === 0 && (
             <Alert severity="info">No resources returned by API.</Alert>
           )}
 
           {/* Data list */}
-          {!loading && !error && resources.length > 0 && (
+          {!loading && !error && resources?.length > 0 && (
             <TableContainer component={Paper}>
               <TablePagination
                 component="div"
