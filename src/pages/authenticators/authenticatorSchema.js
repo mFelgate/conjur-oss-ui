@@ -118,7 +118,7 @@ export const authenticatorSchemas = {
         required: false,
         rows: 10,
         helperText:
-          "A JWT authenticator can have a JWKs URI or a public key, but not both. If you provide a public key, the JWKs URI will be ignored.",
+          "A JWT authenticator can have a JWKs URI or a public key, but not both. If you provide public keys, use this JSON structure: {\"type\":\"jwks\",\"value\":{\"keys\":[{\"kty\":\"RSA\",\"kid\":\"...\",\"alg\":\"RS256\",\"use\":\"sig\",\"n\":\"...\",\"e\":\"AQAB\"}]}}. If public_keys is set, jwks_uri is ignored.",
       },
       {
         key: "issuer",
@@ -149,16 +149,20 @@ export const authenticatorSchemas = {
       {
         key: "identity.enforced_claims",
         label: "Enforced Claims",
-        type: "array",
+        type: "textarea",
         required: false,
-        rows: 1,
+        rows: 3,
+        helperText:
+          "Optional JSON array of claim names to enforce. Example: [\"iss\",\"aud\",\"preferred_username\"].",
       },
       {
         key: "identity.claim_aliases",
         label: "Claim Aliases",
-        type: "json",
+        type: "textarea",
         required: false,
-        rows: 1,
+        rows: 4,
+        helperText:
+          "Optional JSON object mapping token claims to Conjur aliases. Example: {\"preferred_username\":\"username\"}.",
       },
     ],
   },

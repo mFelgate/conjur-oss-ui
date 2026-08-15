@@ -34,6 +34,7 @@ export const authService = {
     return apiRequestText(path, {
       method: "POST",
       body: apiKey,
+      suppressUnauthorizedRedirect: true,
     }).then((rawToken) => normalizeConjurToken(rawToken));
   },
 
@@ -52,6 +53,7 @@ export const authService = {
         nonce,
         code_verifier: codeVerifier,
       },
+      suppressUnauthorizedRedirect: true,
     }).then((rawToken) => normalizeConjurToken(rawToken));
   },
 

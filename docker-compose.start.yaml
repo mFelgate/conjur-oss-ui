@@ -1,0 +1,15 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.start
+    container_name: react-dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - VITE_CONJUR_URL=${VITE_CONJUR_URL}
+      - VITE_CONJUR_ACCOUNT=${VITE_CONJUR_ACCOUNT}
+      - CHOKIDAR_USEPOLLING=true

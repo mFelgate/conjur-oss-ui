@@ -38,6 +38,7 @@ import Resources from "./pages/resources/Resources.jsx";
 import ResourceDetail from "./pages/resources/ResourceDetails.jsx";
 import Dashboard from "./pages/dashboard/dashboard.jsx";
 import OIDCCallback from "./pages/OIDCCallback";
+import TokenExpired from "./pages/TokenExpired";
 
 import "./App.css";
 
@@ -65,6 +66,7 @@ function AppRoutes() {
       <Toolbar sx={{ display: { xs: "block", lg: "none" } }} />
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/token-expired" element={<TokenExpired />} />
         <Route path="/" element={<Navigate to="/resources" replace />} />
         <Route
           path="/resources"

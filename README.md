@@ -1,5 +1,7 @@
 # Conjur UI React 
 
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+
 A lightweight React-based administration interface for Conjur OSS. It provides a modern web UI for managing resources, secrets, policies, groups, and authenticators while complementing the existing CLI and REST API.
 
 The goal is to provide a simple developer-friendly interface for learning, testing, and working with Conjur OSS.
@@ -116,6 +118,8 @@ You can start the UI container and provide a deployment-specific Conjur account 
 ./start.sh --account cucumber --conjur-uri http://conjur:3000
 ```
 
+The root start flow uses a standalone compose file ([docker-compose.start.yaml](docker-compose.start.yaml)) with only the UI container and a dedicated Dockerfile ([Dockerfile.start](Dockerfile.start)). It does not include Keycloak and does not join external Docker networks.
+
 For local OIDC/Keycloak profile startup, use the development workflow in [dev/README.md](dev/README.md).
 
 ## Screenshots
@@ -200,7 +204,7 @@ Create authenticators across multiple supported authentication methods.
 #### Effective Policy
 View the effective policy generated from loaded policy content.
 
-![Effective Policy](./screenshots/EffectivePolicy.png)
+![Effective Policy](./screenshots/PolicyView.png)
 
 #### Policy Editor
 Edit policies using the built-in YAML editor with validation feedback.

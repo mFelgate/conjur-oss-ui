@@ -8,6 +8,7 @@ interface RequestOptions {
   query?: object;
   headers?: Record<string, string>;
   dryRun?: boolean;
+  suppressUnauthorizedRedirect?: boolean;
 }
 
 export interface PolicyErrorResponse {
@@ -112,7 +113,9 @@ export async function apiRequestJson<T>(
 
     if (response.status === 401) {
       localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
-      window.location.href = "/login";
+      if (!options.suppressUnauthorizedRedirect) {
+        window.location.href = "/token-expired";
+      }
       return Promise.reject(new Error("Unauthorized"));
     }
 
@@ -157,7 +160,9 @@ export async function apiRequestText(
 
     if (response.status === 401) {
       localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
-      window.location.href = "/login";
+      if (!options.suppressUnauthorizedRedirect) {
+        window.location.href = "/token-expired";
+      }
       return Promise.reject(new Error("Unauthorized"));
     }
 
@@ -207,7 +212,9 @@ export async function apiRequestTextFullResponse(
 
     if (response.status === 401) {
       localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
-      window.location.href = "/login";
+      if (!options.suppressUnauthorizedRedirect) {
+        window.location.href = "/token-expired";
+      }
       return Promise.reject(new Error("Unauthorized"));
     }
 

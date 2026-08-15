@@ -91,8 +91,63 @@ export default function CreateAuthenticator() {
         payload.type === "jwt" &&
         typeof payload.data.public_keys === "string"
       ) {
-        payload.data.public_keys = JSON.parse(payload.data.public_keys);
+        const parsedPublicKeys = JSON.parse(payload.data.public_keys);
+        if (
+          !parsedPublicKeys ||
+          typeof parsedPublicKeys !== "object" ||
+          Array.isArray(parsedPublicKeys) ||
+          parsedPublicKeys.type !== "jwks" ||
+          !parsedPublicKeys.value ||
+          !Array.isArray(parsedPublicKeys.value.keys)
+        ) {
+          throw new Error(
+            "JWT public_keys must be a JSON object in this format: {\"type\":\"jwks\",\"value\":{\"keys\":[...]}}.",
+          );
+        }
+
+        payload.data.public_keys = parsedPublicKeys;
       }
+
+      if (payload.type === "jwt" && payload.data?.identity) {
+        const { identity } = payload.data;
+
+        if (typeof identity.enforced_claims === "string") {
+          const rawEnforcedClaims = identity.enforced_claims.trim();
+
+          if (!rawEnforcedClaims) {
+            delete identity.enforced_claims;
+          } else {
+            const parsedEnforcedClaims = JSON.parse(rawEnforcedClaims);
+            if (!Array.isArray(parsedEnforcedClaims)) {
+              throw new Error(
+                "JWT enforced_claims must be a JSON array of claim names.",
+              );
+            }
+            identity.enforced_claims = parsedEnforcedClaims;
+          }
+        }
+
+        if (typeof identity.claim_aliases === "string") {
+          const rawClaimAliases = identity.claim_aliases.trim();
+
+          if (!rawClaimAliases) {
+            delete identity.claim_aliases;
+          } else {
+            const parsedClaimAliases = JSON.parse(rawClaimAliases);
+            if (
+              !parsedClaimAliases ||
+              typeof parsedClaimAliases !== "object" ||
+              Array.isArray(parsedClaimAliases)
+            ) {
+              throw new Error(
+                "JWT claim_aliases must be a JSON object mapping claims to aliases.",
+              );
+            }
+            identity.claim_aliases = parsedClaimAliases;
+          }
+        }
+      }
+
       const response = await authenticatorsService.create(payload);
       setError(null);
 
