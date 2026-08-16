@@ -6,6 +6,7 @@ import type {
   AuthenticatorsV2ListEnvelopeResponse,
   ListAuthenticatorsV2QueryRequest,
   ProvidersListResponse,
+  AuthenticatorsIndexResponse,
 } from '../types'
 import { CONJUR_ACCOUNT } from "../config";
 const RootPath = `/authenticators/${encodeURIComponent(CONJUR_ACCOUNT)}`;
@@ -13,12 +14,17 @@ const RootPath = `/authenticators/${encodeURIComponent(CONJUR_ACCOUNT)}`;
 
 export const authenticatorsService = {
   providers() {
-    const path = `/authn-oidc/cucumber/providers`
+    const path = `/authn-oidc/${encodeURIComponent(CONJUR_ACCOUNT)}/providers`
     return apiRequest<ProvidersListResponse>(path, {
       headers: {
         accept: 'application/x.secretsmgr.v2beta+json',
       },
     })
+  },
+  // This v1 endpoint reports Conjur's effective state, including authenticators
+  // enabled through CONJUR_AUTHENTICATORS or conjur.yml.
+  index() {
+    return apiRequest<AuthenticatorsIndexResponse>("/authenticators")
   },
   list(params: ListAuthenticatorsV2QueryRequest = {}) {
     return apiRequest<AuthenticatorsV2ListEnvelopeResponse>(RootPath, {

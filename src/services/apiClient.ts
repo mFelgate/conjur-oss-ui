@@ -63,6 +63,33 @@ export class ApiError<T = unknown> extends Error {
   }
 }
 
+function apiErrorFromResponse(
+  message: string,
+  status: number,
+  statusText: string,
+): { response: ApiErrorResponse; detail: string } {
+  try {
+    const response = JSON.parse(message) as ApiErrorResponse;
+    return {
+      response,
+      detail: response?.error?.message || message || `${status} ${statusText || "error"}`,
+    };
+  } catch {
+    const detail = message || `${status} ${statusText || "error"}`;
+    return {
+      response: {
+        error: {
+          code: String(status),
+          message: detail,
+          target: "",
+          details: { code: "", target: "", message: detail },
+        },
+      },
+      detail,
+    };
+  }
+}
+
 function buildUrl(path: string, query?: object) {
   const url = new URL(path, API_BASE_URL || window.location.origin);
   if (query) {
@@ -121,8 +148,16 @@ export async function apiRequestJson<T>(
 
     if (!response.ok) {
       const message = await response.text();
-      const apiError = JSON.parse(message) as ApiErrorResponse;
-      throw new ApiError(apiError, response.status);
+      const { response: apiError, detail } = apiErrorFromResponse(
+        message,
+        response.status,
+        response.statusText,
+      );
+      throw new ApiError(
+        apiError,
+        response.status,
+        `${path} failed: ${response.status} ${detail}`,
+      );
     }
 
     if (response.status === 204) {
@@ -168,15 +203,16 @@ export async function apiRequestText(
 
     if (!response.ok) {
       const message = await response.text();
-      let apiError: ApiErrorResponse | string = message;
-
-      try {
-        apiError = JSON.parse(message) as ApiErrorResponse;
-      } catch {
-        // keep plain text fallback
-      }
-
-      throw new ApiError(apiError, response.status);
+      const { response: apiError, detail } = apiErrorFromResponse(
+        message,
+        response.status,
+        response.statusText,
+      );
+      throw new ApiError(
+        apiError,
+        response.status,
+        `${path} failed: ${response.status} ${detail}`,
+      );
     }
 
     if (response.status === 204) {
@@ -225,11 +261,15 @@ export async function apiRequestTextFullResponse(
         throw new ApiError(apiError, response.status);
       }
 
-      const apiError = JSON.parse(message) as ApiErrorResponse;
+      const { response: apiError, detail } = apiErrorFromResponse(
+        message,
+        response.status,
+        response.statusText,
+      );
       throw new ApiError(
         apiError,
         response.status,
-        `API request failed for ${path}: ${response.statusText}`,
+        `${path} failed: ${response.status} ${detail}`,
       );
     }
 

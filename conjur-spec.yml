@@ -150,6 +150,10 @@ info:
     name: Apache-2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
   title: Conjur
+  # This bundled specification reflects Conjur OSS 5.3.2 and does not include
+  # newer account-scoped v2 endpoints used by the UI (for example,
+  # /authenticators/{account}). Consult the server's matching API specification
+  # when integrating against a newer Conjur OSS release.
   version: 5.3.2
 openapi: 3.1.0
 paths:

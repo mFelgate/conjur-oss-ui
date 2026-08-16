@@ -13,6 +13,7 @@ import {
   Typography,
 } from "@mui/material";
 import { authenticatorsService } from "../../services";
+import { ApiError } from "../../services/apiClient";
 
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -41,15 +42,26 @@ function AuthenticatorItem({ authenticator, handleDeleteAuthenticator, handleTog
         </TableCell>
         <TableCell align="right">{authenticator.type}</TableCell>
         <TableCell align="right">
-          <Switch
-            checked={authenticator.enabled}
-            onChange={(event) => {
-              handleToggleAuthenticator(authenticator, event.target.checked);
-            }}
-            inputProps={{
-              "aria-label": `Toggle ${authenticator.name}`,
-            }}
-          />
+          <Tooltip
+            title={
+              authenticator.staticallyEnabled
+                ? "Enabled by Conjur server configuration; disable it in CONJUR_AUTHENTICATORS or conjur.yml."
+                : ""
+            }
+          >
+            <span>
+              <Switch
+                checked={authenticator.enabled}
+                disabled={authenticator.staticallyEnabled}
+                onChange={(event) => {
+                  handleToggleAuthenticator(authenticator, event.target.checked);
+                }}
+                inputProps={{
+                  "aria-label": `Toggle ${authenticator.name}`,
+                }}
+              />
+            </span>
+          </Tooltip>
         </TableCell>
         <TableCell align="right">{authenticator.branch ?? ""}</TableCell>
         <TableCell align="right">
@@ -102,6 +114,12 @@ export default function Authenticators() {
   }
 
   async function handleToggleAuthenticator(authenticator, checked) {
+    if (authenticator.staticallyEnabled && !checked) {
+      setError(
+        "This authenticator is enabled by Conjur server configuration. Disable it in CONJUR_AUTHENTICATORS or conjur.yml.",
+      );
+      return;
+    }
     try {
       const updatedAuthenticator = await authenticatorsService.update(
         checked,
@@ -109,11 +127,28 @@ export default function Authenticators() {
         authenticator.name,
       );
 
+      // A v2 disable cannot override static configuration. Re-read Conjur's
+      // effective list so that a successful PATCH is not mistaken for a
+      // successful disable.
+      const effectiveState = await authenticatorsService.index();
+      const identifier = `authn-${authenticator.type}/${authenticator.name}`;
+      const remainsEnabled = !checked && effectiveState.enabled?.includes(identifier);
+
+      if (remainsEnabled) {
+        setError(
+          "Conjur server configuration still enables this authenticator. Disable it in CONJUR_AUTHENTICATORS or conjur.yml.",
+        );
+      }
+
       setAuthenticators((currentAuthenticators) =>
         currentAuthenticators.map((currentAuthenticator) =>
           currentAuthenticator.type === authenticator.type &&
           currentAuthenticator.name === authenticator.name
-            ? updatedAuthenticator
+            ? {
+                ...updatedAuthenticator,
+                enabled: remainsEnabled || updatedAuthenticator.enabled,
+                staticallyEnabled: remainsEnabled,
+              }
             : currentAuthenticator,
         ),
       );
@@ -150,23 +185,48 @@ export default function Authenticators() {
     let isMounted = true;
     async function loadAuthenticators() {
       try {
-        const response = await authenticatorsService.list({
-          offset: page * rowsPerPage,
-          limit: rowsPerPage,
-          type: authType || undefined,
-        });
+        const [response, effectiveState] = await Promise.all([
+          authenticatorsService.list({
+            offset: page * rowsPerPage,
+            limit: rowsPerPage,
+            type: authType || undefined,
+          }),
+          authenticatorsService.index(),
+        ]);
+
+        const staticallyEnabled = new Set(effectiveState.enabled ?? []);
+        const authenticatorsWithEffectiveState = response.authenticators.map(
+          (authenticator) => {
+            const identifier = `authn-${authenticator.type}/${authenticator.name}`;
+            const effectivelyEnabled = staticallyEnabled.has(identifier);
+            // When v2 says disabled but the effective list says enabled, the
+            // authenticator is definitively enabled by static configuration.
+            const enabledByStaticConfig =
+              !authenticator.enabled && effectivelyEnabled;
+
+            return {
+              ...authenticator,
+              enabled: authenticator.enabled || effectivelyEnabled,
+              staticallyEnabled: enabledByStaticConfig,
+            };
+          },
+        );
 
         if (isMounted) {
-          setAuthenticators(response.authenticators);
+          setAuthenticators(authenticatorsWithEffectiveState);
           setCount(response.count);
           setError("");
         }
       } catch (requestError) {
         if (isMounted) {
+          const compatibilityError =
+            requestError instanceof ApiError && requestError.status === 404
+              ? "Authenticator management requires Conjur OSS 1.24.0 or later."
+              : null;
           setError(
-            requestError instanceof Error
+            compatibilityError ?? (requestError instanceof Error
               ? requestError.message
-              : "Failed to load authenticators.",
+              : "Failed to load authenticators."),
           );
         }
       } finally {

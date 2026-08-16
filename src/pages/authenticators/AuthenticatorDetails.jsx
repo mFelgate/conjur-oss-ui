@@ -12,7 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { DetailRow } from "../resources/resourceDetails.jsx";
+import { DetailRow } from "../resources/ResourceDetails.jsx";
 import { SecretValueField } from "../secrets/SecretDetails.jsx";
 
 import { authenticatorsService } from "../../services";

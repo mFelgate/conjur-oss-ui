@@ -1,5 +1,5 @@
 import { Stack, Typography } from "@mui/material";
-import { DetailRow } from "../resources/resourceDetails.jsx";
+import { DetailRow } from "../resources/ResourceDetails.jsx";
 
 export default function PolicyResourceInfo({ title, resource }) {
   return (
@@ -36,4 +36,3 @@ export default function PolicyResourceInfo({ title, resource }) {
     </Stack>
   );
 }
-

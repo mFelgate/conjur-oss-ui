@@ -20,6 +20,7 @@ The goal is to provide a simple developer-friendly interface for learning, testi
 - [Non-Goals](#non-goals)
 - [Features](#features)
 - [Development Environment](#development-environment)
+- [Conjur OSS compatibility](#conjur-oss-compatibility)
 - [Screenshots](#screenshots)
   - [Resources](#resources-1)
   - [Secrets](#secrets-1)
@@ -121,6 +122,29 @@ You can start the UI container and provide a deployment-specific Conjur account 
 The root start flow uses a standalone compose file ([docker-compose.start.yaml](docker-compose.start.yaml)) with only the UI container and a dedicated Dockerfile ([Dockerfile.start](Dockerfile.start)). It does not include Keycloak and does not join external Docker networks.
 
 For local OIDC/Keycloak profile startup, use the development workflow in [dev/README.md](dev/README.md).
+
+## Conjur OSS compatibility
+
+The Authenticators pages use the account-scoped v2 authenticator API, which requires
+Conjur OSS **1.24.0 or later**. On older servers, the Authenticators pages are not
+available. The `application/x.secretsmgr.v2beta+json` media type used by those API
+calls is a Conjur OSS v2 API media type; it is not specific to Conjur Cloud.
+
+Authenticator enablement can come from either the server's static configuration
+(`CONJUR_AUTHENTICATORS` or `conjur.yml`) or the v2 API. The UI shows the effective
+enabled state. An authenticator enabled statically cannot be disabled through the
+UI, because a v2 disable request cannot override the server configuration; update
+the static configuration instead.
+
+### OIDC redirect URIs
+
+The `redirect_uri` returned by Conjur is shared by all clients of an `authn-oidc`
+service. Do not reuse an authenticator configured for `conjur login` (commonly
+`http://127.0.0.1:8888/callback`) for this UI: the CLI and UI would compete for the
+same callback listener. Configure a separate `authn-oidc` service and redirect URI
+for the UI. The UI callback route is `/login/callback`; the hostname in that URI
+must exactly match the hostname used to open the UI, since OIDC state is stored in
+the browser's per-origin session storage.
 
 ## Screenshots
 
