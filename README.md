@@ -138,13 +138,18 @@ the static configuration instead.
 
 ### OIDC redirect URIs
 
-The `redirect_uri` returned by Conjur is shared by all clients of an `authn-oidc`
-service. Do not reuse an authenticator configured for `conjur login` (commonly
-`http://127.0.0.1:8888/callback`) for this UI: the CLI and UI would compete for the
-same callback listener. Configure a separate `authn-oidc` service and redirect URI
-for the UI. The UI callback route is `/login/callback`; the hostname in that URI
-must exactly match the hostname used to open the UI, since OIDC state is stored in
-the browser's per-origin session storage.
+An `authn-oidc` service has one configured redirect URI. The UI callback route is
+`/login/callback`. For the default Vite development server, configure
+`http://localhost:5173/login/callback`. For another local port or a deployed UI,
+use that UI's exact public URL followed by `/login/callback`, and register the same
+URI with the identity provider. The hostname and port must match the URL used to
+open the UI, since OIDC state is stored in the browser's per-origin session storage.
+
+The Conjur CLI commonly uses `http://127.0.0.1:8888/callback`. This does not conflict
+with a UI callback on a different address or port: they are distinct redirect URIs.
+If the CLI and UI both need OIDC login with different callbacks, configure separate
+`authn-oidc` services (or change the existing service's redirect URI when only one
+client needs OIDC).
 
 ## Screenshots
 

@@ -1,9 +1,9 @@
-import { apiRequestTextFullResponse, apiRequestText } from "./apiClient";
-import type {
-  ApiListResponse,
-  ListPolicyRequest,
-  PolicyRecord,
-} from "../types";
+import {
+  apiRequestTextFullResponse,
+  apiRequestText,
+  type HttpMethod,
+} from "./apiClient";
+import type { PolicyLoadResponse } from "../types";
 import { CONJUR_ACCOUNT } from "../config";
 const RootPath = `/policies/${encodeURIComponent(CONJUR_ACCOUNT)}/policy`;
 
@@ -19,7 +19,7 @@ export const policyService = {
   async loadPolicy(
     policyContent: string,
     branch: string,
-    method: string,
+    method: HttpMethod,
     dryRun: boolean = true,
   ) {
     const path = `${RootPath}/${encodeURIComponent(branch)}`;

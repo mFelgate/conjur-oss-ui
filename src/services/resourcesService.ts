@@ -1,10 +1,14 @@
 import { apiRequest } from './apiClient'
-import type { ListResourcesRequest, ResourcesResponse } from '../types'
+import type {
+  ResourceResponse,
+  ResourcesQueryRequest,
+  ResourcesResponse,
+} from '../types'
 import { CONJUR_ACCOUNT } from "../config";
 const RootPath = `/resources/${encodeURIComponent(CONJUR_ACCOUNT)}`;
 
 export const resourcesService = {
-  list(params: ListResourcesRequest = {}) {
+  list(params: ResourcesQueryRequest = {}) {
     return apiRequest<ResourcesResponse>(RootPath, {
       // Conjur applies pagination before calculating `count`. Count-only
       // requests must therefore omit offset and limit to report the total.
@@ -16,9 +20,9 @@ export const resourcesService = {
             ...params,
           }
     })
-  }, get (kind, identifier) {
+  }, get (kind: string, identifier: string) {
     const path = `${RootPath}/${encodeURIComponent(kind)}/${encodeURIComponent(identifier)}`
-    return apiRequest<ResourcesResponse>(path, {
+    return apiRequest<ResourceResponse>(path, {
       headers: {
         accept: 'application/json',
       },

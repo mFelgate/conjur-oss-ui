@@ -49,7 +49,7 @@ typography: {
   components: {
     MuiButton: {
       styleOverrides: {
-        root: {
+        root: ({ ownerState }) => ({
           borderRadius: 8,
           textTransform: "none",
           fontFamily: '"Open Sans", sans-serif',
@@ -67,15 +67,18 @@ typography: {
             backgroundColor: "#f8fafc",
             boxShadow: "none",
           },
-        },
-        containedPrimary: {
-          backgroundColor: "#1362cb",
-          color: "#ffffff",
-          border: "1px solid #1362cb",
-          "&:hover": {
-            backgroundColor: "#0f4fa8",
-          },
-        },
+          ...(ownerState.variant === "contained" && ownerState.color === "primary"
+            ? {
+                backgroundColor: "#1362cb",
+                color: "#ffffff",
+                border: "1px solid #1362cb",
+                "&:hover": {
+                  backgroundColor: "#0f4fa8",
+                  boxShadow: "none",
+                },
+              }
+            : {}),
+        }),
       },
     },
     MuiAppBar: {
