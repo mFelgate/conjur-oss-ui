@@ -37,7 +37,19 @@ export const authService = {
       suppressUnauthorizedRedirect: true,
     }).then((rawToken) => normalizeConjurToken(rawToken));
   },
+  async passwordLogin(account: string, login: string, password: string) {
+    const path = `/authn/${encodeURIComponent(account)}/login`;
 
+     const apiKey = await apiRequestText(path, {
+      method: "GET",
+      headers: {
+        Authorization: "Basic " + toBase64(login + ":" + password),
+      },
+      suppressUnauthorizedRedirect: true,
+    });
+
+    return authService.getAccessToken(account, login, apiKey);
+  },
   oidcLogin(
     serviceId: string,
     code: string,
@@ -64,7 +76,7 @@ export const authService = {
       throw new Error("Missing VITE_CONJUR_ACCOUNT. Set it in .env.local.");
     }
 
-    return authService.getAccessToken(account, credentials.login, credentials.apiKey);
+    return authService.passwordLogin(account, credentials.login, credentials.apiKey);
   },
 
   whoAmI() {

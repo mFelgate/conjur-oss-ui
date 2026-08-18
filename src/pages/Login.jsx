@@ -91,7 +91,7 @@ export default function Login() {
                 fullWidth
               />
               <TextField
-                label="API Key"
+                label="API Key or Password"
                 type="password"
                 value={apiKey}
                 onChange={(event) => setApiKey(event.target.value)}
