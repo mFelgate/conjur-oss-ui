@@ -7,6 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
+    "test": "vitest run --exclude tests/**/*.known-issues.test.ts",
+    "test:watch": "vitest --exclude tests/**/*.known-issues.test.ts",
+    "test:known-issues": "vitest run tests/apiClient.known-issues.test.ts",
     "typecheck": "tsc --noEmit",
     "preview": "vite preview"
   },
@@ -30,8 +33,10 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
     "globals": "^17.7.0",
+    "jsdom": "^29.1.1",
     "prettier": "^3.9.5",
     "typescript": "^7.0.2",
-    "vite": "^8.1.1"
+    "vite": "^8.1.1",
+    "vitest": "^4.1.10"
   }
 }
