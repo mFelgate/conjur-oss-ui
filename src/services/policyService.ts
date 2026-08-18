@@ -1,10 +1,8 @@
-import {
-  apiRequestTextFullResponse,
-  apiRequestText,
-  type HttpMethod,
-} from "./apiClient";
+import { apiRequestTextFullResponse, apiRequestText } from "./apiClient";
+import type { HttpMethod } from "./apiClient";
 import type { PolicyLoadResponse } from "../types";
 import { CONJUR_ACCOUNT } from "../config";
+
 const RootPath = `/policies/${encodeURIComponent(CONJUR_ACCOUNT)}/policy`;
 
 export const policyService = {
@@ -19,24 +17,25 @@ export const policyService = {
   async loadPolicy(
     policyContent: string,
     branch: string,
-    method: HttpMethod,
+    method: Extract<HttpMethod, "POST" | "PATCH" | "PUT">,
     dryRun: boolean = true,
   ) {
     const path = `${RootPath}/${encodeURIComponent(branch)}`;
 
     const response = await apiRequestTextFullResponse(path, {
-      method: method,
+      method,
       query: {
-        dryRun: dryRun,
+        dryRun,
       },
-       headers: {
+      headers: {
         accept: "text/plain",
       },
       body: policyContent,
     });
 
-    return { status: response.status, data: JSON.parse(response.data) as PolicyLoadResponse };
+    return {
+      status: response.status,
+      data: JSON.parse(response.data) as PolicyLoadResponse,
+    };
   },
-
-  
 };
