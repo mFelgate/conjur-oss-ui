@@ -30,16 +30,40 @@ function formatValue(value) {
     : JSON.stringify(value, null, 2);
 }
 
-function AddSecretField({ resource }) {
+function AddSecretField({ resource, onSaved }) {
   const [value, setValue] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const parts = String(resource.id ?? "").split(":");
   const serviceId = parts[2];
   const kind = parts[1];
+  const canSave = Boolean(kind && serviceId);
 
   const saveSecret = async () => {
-    await secretsService.set(kind, serviceId, value);
-    // reload resource or flip secretPresent
+    if (!canSave) {
+      setError("Invalid resource id. Expected format: account:kind:id");
+      return;
+    }
+
+    setSaving(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      await secretsService.set(kind, serviceId, value);
+      setSuccess("Secret saved.");
+      onSaved?.();
+    } catch (requestError) {
+      setError(
+        requestError instanceof Error
+          ? requestError.message
+          : "Failed to save secret.",
+      );
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -60,9 +84,11 @@ function AddSecretField({ resource }) {
         }}
       />
 
-      <Button sx={{ mt: 2 }} variant="contained" onClick={saveSecret}>
+      <Button sx={{ mt: 2 }} variant="contained" onClick={saveSecret} disabled={saving}>
         Save Secret
       </Button>
+      {success && <Alert sx={{ mt: 2 }} severity="success">{success}</Alert>}
+      {error && <Alert sx={{ mt: 2 }} severity="error">{error}</Alert>}
     </Paper>
   );
 }
@@ -73,8 +99,19 @@ export function SecretValueField({ resource }) {
   const kind = parts[1];
   const [editing, setEditing] = useState(false);
   const [editedValue, setEditedValue] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const canSave = Boolean(kind && serviceId);
 
   const startEdit = async () => {
+    if (!canSave) {
+      setError("Invalid resource id. Expected format: account:kind:id");
+      return;
+    }
+
+    setError("");
+    setSuccess("");
     setEditing(true);
     const value = await secretsService.get(kind, serviceId);
     setEditedValue(formatValue(value));
@@ -86,13 +123,27 @@ export function SecretValueField({ resource }) {
   };
 
   const saveSecret = async (serviceId) => {
+    if (!canSave) {
+      setError("Invalid resource id. Expected format: account:kind:id");
+      return;
+    }
+
+    setSaving(true);
+    setError("");
+    setSuccess("");
+
     try {
       await secretsService.set(kind, serviceId, editedValue);
-
+      setSuccess("Secret updated.");
       cancelEdit();
-    } catch (error) {
-      console.error("Failed to update secret:", error);
-      // Handle error (e.g., show a notification)
+    } catch (requestError) {
+      setError(
+        requestError instanceof Error
+          ? requestError.message
+          : "Failed to update secret.",
+      );
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -122,16 +173,19 @@ export function SecretValueField({ resource }) {
                 variant="contained"
                 startIcon={<CheckIcon />}
                 onClick={() => saveSecret(serviceId)}
+                disabled={saving}
               >
                 Save
               </Button>
 
-              <Button startIcon={<CloseIcon />} onClick={cancelEdit}>
+              <Button startIcon={<CloseIcon />} onClick={cancelEdit} disabled={saving}>
                 Cancel
               </Button>
             </Stack>
           )}
         </Box>
+        {success && <Alert severity="success">{success}</Alert>}
+        {error && <Alert severity="error">{error}</Alert>}
         {editing ? (
           <TextField
             fullWidth
@@ -168,20 +222,26 @@ export function SecretValueField({ resource }) {
 }
 
 export default function SecretDetails({ resource }) {
+  const [hasSecretOverride, setHasSecretOverride] = useState(null);
+  const hasSecret =
+    hasSecretOverride ??
+    (Array.isArray(resource?.secrets) && resource.secrets.length > 0);
+
   return (
     <Box sx={{ py: 4 }}>
         <Stack spacing={3}>
 
-          { resource?.secrets?.length === 0 && (
+          {!hasSecret && (
             <>
               <Alert severity="info">Secret not found.</Alert>
               <AddSecretField
                 resource={resource}
+                onSaved={() => setHasSecretOverride(true)}
               />
             </>
           )}
 
-        { resource?.secrets?.length > 0 && (
+        {hasSecret && (
             <>
               <SecretValueField resource={resource} />
             </>
