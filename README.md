@@ -54,6 +54,7 @@ For production deployments, high-availability configurations, compliance reporti
 ### Authentication
 - ✅ Password authentication
 - ✅ OIDC authentication
+- ✅ Update Conjur Password
 
 ### Resources
 - ✅ View resources
@@ -61,6 +62,12 @@ For production deployments, high-availability configurations, compliance reporti
 - ✅ View resource annotations
 - ✅ View resource permissions
 - ⬜ Role Graph
+
+### Users
+- ✅ Rotate API Key
+
+### Host
+- ✅ Rotate API Key
 
 ### Secrets
 - ✅ Browse secrets
