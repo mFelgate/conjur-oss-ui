@@ -22,6 +22,7 @@ import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import MenuIcon from "@mui/icons-material/Menu";
 import IconButton from "@mui/material/IconButton";
 
@@ -39,6 +40,7 @@ import ResourceDetail from "./pages/resources/ResourceDetails.jsx";
 import Dashboard from "./pages/dashboard/dashboard.jsx";
 import OIDCCallback from "./pages/OIDCCallback";
 import TokenExpired from "./pages/TokenExpired";
+import WhoAmI from "./pages/WhoAmI";
 
 import "./App.css";
 
@@ -125,6 +127,14 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/whoami"
+          element={
+            <ProtectedRoute>
+              <WhoAmI />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </>
   );
@@ -148,40 +158,33 @@ function DrawerContent({ logout }) {
           <DashboardIcon sx={{ mr: 2 }} />
           <ListItemText primary="Dashboard" />
         </ListItemButton>
+
         <ListItemButton component={Link} to="/resources">
           <Inventory2OutlinedIcon sx={{ mr: 2 }} />
           <ListItemText primary="Resources" />
         </ListItemButton>
 
-        {/* <ListItemButton component={Link} to="/resources?kind=variable">
-          <KeyOutlinedIcon sx={{ mr: 2 }} />
-          <ListItemText primary="Secrets" />
-        </ListItemButton>
-
-        <ListItemButton component={Link} to="/resources?kind=group">
-          <GroupOutlinedIcon sx={{ mr: 2 }} />
-          <ListItemText primary="Groups" />
-        </ListItemButton> */}
-
         <ListItemButton component={Link} to="/authenticators">
           <SecurityOutlinedIcon sx={{ mr: 2 }} />
           <ListItemText primary="Authenticators" />
         </ListItemButton>
-{/* 
-        <ListItemButton component={Link} to="/resources?kind=policy">
-          <DescriptionOutlinedIcon sx={{ mr: 2 }} />
-          <ListItemText primary="Policy" />
-        </ListItemButton> */}
 
         <ListItemButton component={Link} to="/policy/load">
           <CloudUploadIcon sx={{ mr: 2 }} />
           <ListItemText primary="Load Policy" />
         </ListItemButton>
 
+
+        <ListItemButton component={Link} to="/whoami">
+          <AccountCircleOutlinedIcon sx={{ mr: 2 }} />
+          <ListItemText primary="Profile" />
+        </ListItemButton>
+
         <ListItemButton onClick={logout}>
           <LogoutOutlinedIcon sx={{ mr: 2 }} />
           <ListItemText primary="Logout" />
         </ListItemButton>
+
       </List>
     </>
   );

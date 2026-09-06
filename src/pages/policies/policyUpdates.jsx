@@ -113,10 +113,15 @@ export default function PolicyUpdates({ UpdatedResources }) {
 
   return (
     <Stack spacing={1}>
+      <Typography variant="h6" sx={{ mt: 1 }}>
+        Resource To Be Updated
+      </Typography>
+
       {beforeItems.map((beforeItem) => {
         const afterItem =
-          afterItems.find((item) => item.identifier === beforeItem.identifier) ??
-          {};
+          afterItems.find(
+            (item) => item.identifier === beforeItem.identifier,
+          ) ?? {};
         const membersChange = arrayChanged(
           beforeItem.members,
           afterItem.members,

@@ -51,6 +51,26 @@ interface TextRequestOptions extends RequestOptions {
 
 const ACCESS_TOKEN_STORAGE_KEY = "conjur.accessToken";
 
+function handleUnauthorized(path: string, options: RequestOptions): never {
+  if (!options.suppressUnauthorizedRedirect) {
+    localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
+    window.location.href = "/token-expired";
+  }
+
+  throw new ApiError(
+    {
+      error: {
+        code: "401",
+        message: "Unauthorized",
+        target: path,
+        details: { code: "401", target: path, message: "Unauthorized" },
+      },
+    },
+    401,
+    `${path} failed: 401 Unauthorized`,
+  );
+}
+
 export class ApiError<T = unknown> extends Error {
   response: T;
   status: number;
@@ -139,11 +159,7 @@ export async function apiRequestJson<T>(
     });
 
     if (response.status === 401) {
-      localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
-      if (!options.suppressUnauthorizedRedirect) {
-        window.location.href = "/token-expired";
-      }
-      return Promise.reject(new Error("Unauthorized"));
+      handleUnauthorized(path, options);
     }
 
     if (!response.ok) {
@@ -194,11 +210,7 @@ export async function apiRequestText(
     });
 
     if (response.status === 401) {
-      localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
-      if (!options.suppressUnauthorizedRedirect) {
-        window.location.href = "/token-expired";
-      }
-      return Promise.reject(new Error("Unauthorized"));
+      handleUnauthorized(path, options);
     }
 
     if (!response.ok) {
@@ -247,11 +259,7 @@ export async function apiRequestTextFullResponse(
     });
 
     if (response.status === 401) {
-      localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
-      if (!options.suppressUnauthorizedRedirect) {
-        window.location.href = "/token-expired";
-      }
-      return Promise.reject(new Error("Unauthorized"));
+      handleUnauthorized(path, options);
     }
 
     if (!response.ok) {

@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useRef, useState } from "react";
 import {
   Alert,
   Box,
@@ -15,28 +15,9 @@ import {
 } from "@mui/material";
 import Editor from "@monaco-editor/react";
 import { policyService } from "../../services/policyService";
+import PolicyCreated from "./policyCreated.jsx";
+import PolicyDeleted from "./policyDeleted.jsx";
 import PolicyUpdates from "./policyUpdates.jsx";
-
-function PolicyDryRunResourceInfo({ title, resource }) {
-  return (
-    <Stack spacing={0.5}>
-      <Typography variant="subtitle2">{title}</Typography>
-      <Typography variant="body2">
-        <strong>ID:</strong> {resource?.id}
-      </Typography>
-      {resource?.kind && (
-        <Typography variant="body2">
-          <strong>Kind:</strong> {resource.kind}
-        </Typography>
-      )}
-      {resource?.branch && (
-        <Typography variant="body2">
-          <strong>Branch:</strong> {resource.branch}
-        </Typography>
-      )}
-    </Stack>
-  );
-}
 
 export default function PolicyLoad() {
   const [policyText, setPolicyText] = useState("");
@@ -73,6 +54,15 @@ export default function PolicyLoad() {
       decorationsRef.current,
       [],
     );
+  };
+
+  const resetPolicyPreview = () => {
+    setPolicyResponse(null);
+    setResponseStatus(null);
+    setCreatedItems([]);
+    setDeletedItems([]);
+    setError("");
+    clearErrors();
   };
 
   const showErrors = (errors) => {
@@ -148,7 +138,10 @@ export default function PolicyLoad() {
           <TextField
             label="Branch"
             value={branch}
-            onChange={(event) => setBranch(event.target.value)}
+            onChange={(event) => {
+              setBranch(event.target.value);
+              resetPolicyPreview();
+            }}
             placeholder="Type branch name"
             fullWidth
           />
@@ -159,7 +152,10 @@ export default function PolicyLoad() {
                   control={
                     <Switch
                       checked={dryRun}
-                      onChange={(e) => setDryRun(e.target.checked)}
+                      onChange={(e) => {
+                        setDryRun(e.target.checked);
+                        resetPolicyPreview();
+                      }}
                     />
                   }
                   label="Dry Run"
@@ -170,6 +166,7 @@ export default function PolicyLoad() {
                   onChange={(event, value) => {
                     if (value !== null) {
                       setMethod(value);
+                      resetPolicyPreview();
                     }
                   }}
                   aria-label="policy operation"
@@ -185,12 +182,16 @@ export default function PolicyLoad() {
                 defaultLanguage="yaml"
                 value={policyText}
                 onMount={handleEditorDidMount}
-                onChange={(value) => setPolicyText(value ?? "")}
+                onChange={(value) => {
+                  setPolicyText(value ?? "");
+                  resetPolicyPreview();
+                }}
               />
               {error && <Alert severity="error">{error}</Alert>}
-              <Stack direction="row" justifyContent="flex-end">
+              <Stack direction="column" spacing={2} alignItems="flex-start">
                 <Button
                   variant="contained"
+                  sx={{ alignSelf: "flex-start", width: "fit-content" }}
                   onClick={handleSubmit}
                   disabled={loading || !policyText.trim()}
                 >
@@ -200,57 +201,38 @@ export default function PolicyLoad() {
             </Stack>
           </Paper>
 
+          {!error && policyResponse && !dryRun && (
+            <Paper>
+              <Stack spacing={2} sx={{ p: 2 }}>
+                <Typography sx={{ mt: 1 }}>
+                  Policy loaded successfully: Version {policyResponse.version}
+                </Typography>
+
+                {policyResponse.created_roles && (
+                  <Stack direction="column" spacing={2} sx={{ mt: 2 }}>
+                    {Object.values(policyResponse.created_roles).map((role) => (
+                      <Box key={role.id}>
+                        <Typography variant="subtitle1">{role.id}</Typography>
+
+                        <Typography
+                          variant="body2"
+                          component="code"
+                          sx={{ wordBreak: "break-all" }}
+                        >
+                          API Key: {role.api_key}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Stack>
+                )}
+              </Stack>
+            </Paper>
+          )}
+
           {!error && policyResponse && responseStatus === 200 && (
             <Stack spacing={2}>
-              {createdItems?.length > 0 && (
-                  <>
-                    <Typography variant="h6" sx={{ mt: 1 }}>
-                      Resource to Be Created
-                    </Typography>
-                    <Stack spacing={1}>
-                      {createdItems.map((resource) => (
-                        <Paper
-                          key={resource.id}
-                          variant="outlined"
-                          sx={{ p: 2 }}
-                        >
-                          <PolicyDryRunResourceInfo
-                            key={resource.id}
-                            title="Created Resource"
-                            resource={resource}
-                          />
-                        </Paper>
-                      ))}
-                    </Stack>
-                  </>
-                )}
-
-              {deletedItems?.length > 0 && (
-                  <>
-                    <Typography variant="h6" sx={{ mt: 1 }}>
-                      Resource to Be Deleted
-                    </Typography>
-                    <Stack spacing={1}>
-                      {deletedItems.map((resource) => (
-                        <Paper
-                          key={resource.id}
-                          variant="outlined"
-                          sx={{ p: 2 }}
-                        >
-                          <PolicyDryRunResourceInfo
-                            key={resource.id}
-                            title="Deleted Resource"
-                            resource={resource}
-                          />
-                        </Paper>
-                      ))}
-                    </Stack>
-                  </>
-                )}
-
-              <Typography variant="h6" sx={{ mt: 1 }}>
-                Resource To Be Updated
-              </Typography>
+              <PolicyCreated items={createdItems} />
+              <PolicyDeleted items={deletedItems} />
               <PolicyUpdates UpdatedResources={policyResponse.updated} />
             </Stack>
           )}

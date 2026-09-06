@@ -17,6 +17,7 @@ import { resourcesService } from "../../services";
 import SecretDetails from "../secrets/SecretDetails.jsx";
 import GroupDetails from "../members/GroupDetails.jsx";
 import PolicyDetails from "../policies/policyDetails.jsx";
+import ApiKeyDetails from "../apiKey/apiKeyDetails.jsx";
 
 export function DetailRow({ label, value }) {
   return (
@@ -35,67 +36,69 @@ export function ResourceInfo({ title, resource }) {
       <Stack spacing={0.5}>
         <Typography variant="h4" component="h2">
           {title}
+        </Typography>
+        <Divider />
+      </Stack>
+
+      <Paper variant="outlined" sx={{ p: 2 }}>
+        <Stack spacing={1.5}>
+          <Typography variant="h6" color="text.secondary">
+            Details
           </Typography>
-      <Divider />
-    </Stack>
+          <DetailRow label="Name" value={resource.id} />
+          <DetailRow label="Owner" value={resource.owner} />
+          <DetailRow label="Policy" value={resource.policy} />
+          <DetailRow label="Created At" value={resource.created_at} />
+        </Stack>
+      </Paper>
 
-    <Paper variant="outlined" sx={{ p: 2 }}>
-      <Stack spacing={1.5}>
-        <Typography variant="h6" color="text.secondary">
-          Details
-        </Typography>
-        <DetailRow label="Name" value={resource.id} />
-        <DetailRow label="Owner" value={resource.owner} />
-        <DetailRow label="Policy" value={resource.policy} />
-        <DetailRow label="Created At" value={resource.created_at} />
-      </Stack>
-    </Paper>
-
- {resource.annotations?.length > 0 && (
-    <Paper variant="outlined" sx={{ p: 2 }}>
-      <Stack spacing={1}>
-        <Typography variant="h6" color="text.secondary">
-          Annotations
-        </Typography>
-        {resource.annotations.map((annotation) => (
-          <Stack
-            key={annotation.name}
-            spacing={1}
-            justifyContent="space-between"
-          >
-           <DetailRow label="Name" value={annotation.name} />
-        <DetailRow label="Value" value={annotation.value} />
-        <DetailRow label="Policy" value={annotation.policy} />
-          </Stack>
-        ))}
-      </Stack>
-    </Paper>)}
-
- {resource.permissions?.length > 0 && (
-    <Paper variant="outlined" sx={{ p: 2 }}>
-      <Stack spacing={1}>
-        <Typography variant="h6" color="text.secondary">
-          Permissions
-        </Typography>
-        {resource.permissions.map((permission) => (
-          <Stack
-            key={`${permission.role}-${permission.privilege}`}
-
-            direction="row"
-            spacing={2}
-            justifyContent="space-between"
-          >
-            <Typography variant="body2" color="text.secondary">
-              {permission.privilege}
+      {resource.annotations?.length > 0 && (
+        <Paper variant="outlined" sx={{ p: 2 }}>
+          <Stack spacing={1}>
+            <Typography variant="h6" color="text.secondary">
+              Annotations
             </Typography>
-            <Typography variant="body2">{permission.role}</Typography>
+            {resource.annotations.map((annotation) => (
+              <Stack
+                key={annotation.name}
+                spacing={1}
+                justifyContent="space-between"
+              >
+                <DetailRow label="Name" value={annotation.name} />
+                <DetailRow label="Value" value={annotation.value} />
+                <DetailRow label="Policy" value={annotation.policy} />
+              </Stack>
+            ))}
           </Stack>
-        ))}
-      </Stack>
-    </Paper>)}
-  </>);
-}
+        </Paper>
+      )}
 
+      {resource.permissions?.length > 0 && (
+        <Paper variant="outlined" sx={{ p: 2 }}>
+          <Stack spacing={1}>
+            <Typography variant="h6" color="text.secondary">
+              Permissions
+            </Typography>
+            {resource.permissions.map((permission) => (
+              <Stack
+                key={`${permission.role}-${permission.privilege}`}
+
+                direction="row"
+                spacing={2}
+                justifyContent="space-between"
+              >
+                <Typography variant="body2" color="text.secondary">
+                  {permission.privilege}
+                </Typography>
+                <Typography variant="body2">{permission.role}</Typography>
+              </Stack>
+            ))}
+          </Stack>
+        </Paper>
+      )}
+    </>
+  );
+}
 
 export default function ResourceDetails() {
   const { serviceId, kind } = useParams();
@@ -160,23 +163,14 @@ export default function ResourceDetails() {
 
           {!loading && !error && resource && (
             <>
-            <ResourceInfo title="Resource" resource={resource} />
-             { kind === "variable" && <SecretDetails resource={resource} /> }
+              <ResourceInfo title="Resource" resource={resource} />
+              {kind === "group" && <GroupDetails resource={resource} />}
+              {kind === "user" && <ApiKeyDetails resource={resource} />}
+              {kind === "host" && <ApiKeyDetails resource={resource} />}
+              {kind === "variable" && <SecretDetails resource={resource} />}
+              {kind === "policy" && <PolicyDetails resource={resource} />}
             </>
           )}
-
-          {!loading && !error && resource && (
-            <>
-             { kind === "group" && <GroupDetails resource={resource} /> }
-            </>
-          )}
-
-           {!loading && !error && resource && (
-            <>
-             { kind === "policy" && <PolicyDetails resource={resource} /> }
-            </>
-          )}
-
         </Stack>
       </Container>
     </Box>

@@ -2,6 +2,7 @@ import { apiRequest, apiRequestText } from "./apiClient";
 import type {
   AccessTokenResponse,
   ConjurAccessTokenRequest,
+  WhoAmIResponse,
 } from "../types";
 import { CONJUR_ACCOUNT } from "../config";
 function toBase64(value: string): string {
@@ -79,7 +80,33 @@ export const authService = {
     return authService.passwordLogin(account, credentials.login, credentials.apiKey);
   },
 
+  rotateUserApiKey(type: string, userId: string) {
+    const path = `/authn/${encodeURIComponent(CONJUR_ACCOUNT)}/api_key`;
+    return apiRequestText(path, {
+      method: "PUT",
+      query: {
+        role: `${type}:${userId}`,
+      },
+      headers: {
+        accept: 'application/json',
+      },
+    });
+  },
+
+  changePassword(login: string, currentApiKey: string, newPassword: string) {
+    const path = `/authn/${encodeURIComponent(CONJUR_ACCOUNT)}/password`;
+    return apiRequestText(path, {
+      method: "PUT",
+      suppressUnauthorizedRedirect: true,
+      headers: {
+        Authorization: "Basic " + toBase64(`${login}:${currentApiKey}`),
+        "Content-Type": "text/plain",
+      },
+      body: newPassword,
+    });
+  },
+
   whoAmI() {
-    return apiRequest("/whoami");
+    return apiRequest<WhoAmIResponse>("/whoami");
   },
 };
