@@ -56,8 +56,10 @@ function AuthenticatorItem({ authenticator, handleDeleteAuthenticator, handleTog
                 onChange={(event) => {
                   handleToggleAuthenticator(authenticator, event.target.checked);
                 }}
-                inputProps={{
-                  "aria-label": `Toggle ${authenticator.name}`,
+                slotProps={{
+                  input: {
+                    "aria-label": `Toggle ${authenticator.name}`,
+                  },
                 }}
               />
             </span>
@@ -269,7 +271,7 @@ export default function Authenticators() {
           </Button>
         </Box>
         <Stack spacing={2} sx={{ mt: 3 }}>
-          <Stack direction="row" spacing={2} flexWrap="wrap">
+          <Stack direction="row" spacing={2} sx={{ flexWrap: "wrap" }}>
             <Select
               value={authType || ""}
               onChange={handleTypeChange}
@@ -286,7 +288,7 @@ export default function Authenticators() {
             </Select>
           </Stack>
           {loading && (
-            <Stack direction="row" spacing={1} alignItems="center">
+            <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
               <CircularProgress size={18} />
               <Typography variant="body2">Loading authenticators...</Typography>
             </Stack>

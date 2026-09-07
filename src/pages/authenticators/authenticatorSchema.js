@@ -151,7 +151,7 @@ export const authenticatorSchemas = {
         label: "Enforced Claims",
         type: "textarea",
         required: false,
-        rows: 3,
+        rows: 2,
         helperText:
           "Optional JSON array of claim names to enforce. Example: [\"iss\",\"aud\",\"preferred_username\"].",
       },
@@ -160,7 +160,7 @@ export const authenticatorSchemas = {
         label: "Claim Aliases",
         type: "textarea",
         required: false,
-        rows: 4,
+        rows: 2,
         helperText:
           "Optional JSON object mapping token claims to Conjur aliases. Example: {\"preferred_username\":\"username\"}.",
       },

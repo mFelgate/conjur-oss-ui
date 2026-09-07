@@ -15,7 +15,11 @@ import ApiKeyDetails from "./apiKey/apiKeyDetails.jsx";
 
 function DetailRow({ label, value }) {
   return (
-    <Stack direction="row" spacing={2} justifyContent="space-between">
+    <Stack
+      direction="row"
+      spacing={2}
+      sx={{ justifyContent: "space-between" }}
+    >
       <Typography variant="body2" color="text.secondary">
         {label}
       </Typography>
@@ -167,7 +171,7 @@ export default function WhoAmI() {
           </Typography>
 
           {loading && (
-            <Stack direction="row" spacing={1} alignItems="center">
+            <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
               <CircularProgress size={18} />
               <Typography variant="body2">Loading identity...</Typography>
             </Stack>

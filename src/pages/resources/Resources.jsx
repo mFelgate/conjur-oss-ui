@@ -159,7 +159,7 @@ export default function Resources() {
       {/* Content width container */}
       <Container>
         {/* Page title */}
-        <Stack justifyContent="space-between" alignItems="center">
+        <Stack sx={{ justifyContent: "space-between", alignItems: "center" }}>
           <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
             Resources
           </Typography>
@@ -178,7 +178,7 @@ export default function Resources() {
         {/* Vertical stack for form + status + list */}
         <Stack spacing={2} sx={{ mt: 3 }}>
           {/* Search field (client-side filter) */}
-          <Stack direction="row" spacing={2} flexWrap="wrap">
+          <Stack direction="row" spacing={2}>
             <TextField
               label="Search resources"
               value={searchInput}
@@ -211,7 +211,7 @@ export default function Resources() {
 
           {/* Loading state UI */}
           {loading && (
-            <Stack direction="row" spacing={1} alignItems="center">
+            <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
               <CircularProgress size={18} />
               <Typography variant="body2">Loading resources...</Typography>
             </Stack>

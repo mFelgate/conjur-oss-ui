@@ -89,7 +89,7 @@ function ResourceCount({ title, type }) {
         {title}
       </Typography>
       {loading && (
-        <Stack direction="row" spacing={1} alignItems="center">
+        <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
           <CircularProgress size={18} />
           <Typography variant="body2">Loading resource count...</Typography>
         </Stack>
@@ -177,7 +177,7 @@ function AuthenticatorCount({ type }) {
         {type}
       </Typography>
       {loading && (
-        <Stack direction="row" spacing={1} alignItems="center">
+        <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
           <CircularProgress size={18} />
           <Typography variant="body2">Loading count...</Typography>
         </Stack>
@@ -231,21 +231,21 @@ export default function Dashboard() {
           groups.
         </Typography>
 
-        <Box spacing={2} flexWrap="wrap" p={2} sx={{ mb: 2 }}>
+        <Box sx={{ mb: 2, p: 2, flexWrap: "wrap" }}>
           <Typography variant="h6" component="h6" sx={{ mb: 2 }}>
             Resources
           </Typography>
           <Divider sx={{ mb: 2 }} />
           <Grid container spacing={1} sx={{ mb: 2 }}>
             {Object.keys(resourceTypes()).map((key) => (
-              <Grid item xs={12} sm={6} md={4} key={key}>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={key}>
                 <ResourceCount title={resourceTypes()[key]} type={key} />
               </Grid>
             ))}
           </Grid>
         </Box>
 
-        <Box spacing={2} flexWrap="wrap" p={2} sx={{ mb: 2 }}>
+        <Box sx={{ mb: 2, p: 2, flexWrap: "wrap" }}>
           <Typography variant="h6" component="h6" sx={{ mb: 2 }}>
             Authenticators
           </Typography>
@@ -253,7 +253,7 @@ export default function Dashboard() {
 
           <Grid container spacing={1} sx={{ mb: 2 }}>
             {Object.keys(authenticatorTypes()).map((key) => (
-              <Grid item xs={12} sm={6} md={4} key={key}>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={key}>
                 <AuthenticatorCount type={authenticatorTypes()[key]} />
               </Grid>
             ))}

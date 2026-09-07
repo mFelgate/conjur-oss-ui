@@ -99,6 +99,23 @@ export default function PolicyLoad() {
     monaco.editor.setModelMarkers(model, "dry-run", markers);
   };
 
+  const getDryRunErrorMessage = (err) => {
+    const errors = err?.response?.errors;
+
+    if (Array.isArray(errors) && errors.length > 0) {
+      const firstMessage = errors[0]?.message;
+      return firstMessage
+        ? `Dry run validation failed: ${firstMessage}`
+        : "Dry run validation failed. Review highlighted lines in the editor.";
+    }
+
+    if (err instanceof Error && err.message) {
+      return `Dry run validation failed: ${err.message}`;
+    }
+
+    return "Dry run validation failed.";
+  };
+
   const handleSubmit = async () => {
     clearErrors();
     setLoading(true);
@@ -122,8 +139,10 @@ export default function PolicyLoad() {
     } catch (err) {
       if (dryRun) {
         showErrors(err);
+        setError(getDryRunErrorMessage(err));
+      } else {
+        setError(err instanceof Error ? err.message : "Failed to load policy.");
       }
-      setError(err instanceof Error ? err.message : "Failed to load policy.");
     } finally {
       setLoading(false);
     }
@@ -147,7 +166,7 @@ export default function PolicyLoad() {
           />
           <Paper variant="outlined" sx={{ p: 2 }}>
             <Stack spacing={2}>
-              <Stack direction="row" spacing={2} alignItems="center">
+              <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
                 <FormControlLabel
                   control={
                     <Switch
@@ -188,7 +207,7 @@ export default function PolicyLoad() {
                 }}
               />
               {error && <Alert severity="error">{error}</Alert>}
-              <Stack direction="column" spacing={2} alignItems="flex-start">
+              <Stack direction="column" spacing={2} sx={{ alignItems: "flex-start" }}>
                 <Button
                   variant="contained"
                   sx={{ alignSelf: "flex-start", width: "fit-content" }}

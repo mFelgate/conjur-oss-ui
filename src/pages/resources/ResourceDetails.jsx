@@ -21,7 +21,7 @@ import ApiKeyDetails from "../apiKey/apiKeyDetails.jsx";
 
 export function DetailRow({ label, value }) {
   return (
-    <Stack direction="row" spacing={2} justifyContent="space-between">
+    <Stack direction="row" spacing={2} sx={{ justifyContent: "space-between" }}>
       <Typography variant="body2" color="text.secondary">
         {label}
       </Typography>
@@ -62,7 +62,7 @@ export function ResourceInfo({ title, resource }) {
               <Stack
                 key={annotation.name}
                 spacing={1}
-                justifyContent="space-between"
+                sx={{ justifyContent: "space-between" }}
               >
                 <DetailRow label="Name" value={annotation.name} />
                 <DetailRow label="Value" value={annotation.value} />
@@ -85,7 +85,7 @@ export function ResourceInfo({ title, resource }) {
 
                 direction="row"
                 spacing={2}
-                justifyContent="space-between"
+                sx={{ justifyContent: "space-between" }}
               >
                 <Typography variant="body2" color="text.secondary">
                   {permission.privilege}
@@ -153,7 +153,7 @@ export default function ResourceDetails() {
           </Button>
 
           {loading && (
-            <Stack direction="row" spacing={1} alignItems="center">
+            <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
               <CircularProgress size={18} />
               <Typography variant="body2">Loading resource...</Typography>
             </Stack>

@@ -98,7 +98,7 @@ export default function AuthenticatorDetails() {
           </Button>
 
           {loading && (
-            <Stack direction="row" spacing={1} alignItems="center">
+            <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
               <CircularProgress size={18} />
               <Typography variant="body2">Loading authenticator...</Typography>
             </Stack>

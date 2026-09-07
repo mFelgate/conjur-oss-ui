@@ -175,8 +175,7 @@ export default function MembershipGroups({ serviceId }) {
             <Stack
               key={member.member}
               direction="row"
-              justifyContent="space-between"
-              alignItems="center"
+              sx={{ justifyContent: "space-between", alignItems: "center" }}
             >
               <Typography
                 variant="body2"
