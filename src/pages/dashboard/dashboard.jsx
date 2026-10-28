@@ -10,7 +10,6 @@ import {
   Stack,
   Typography,
   Divider,
-  Grid,
 } from "@mui/material";
 
 import { resourcesService, authenticatorsService } from "../../services";
@@ -76,10 +75,8 @@ function ResourceCount({ title, type }) {
     // Outer page spacing wrapper.
     <Paper
       sx={{
-        width: {
-          xs: "100%",
-          sm: 200,
-        },
+        width: "100%",
+        height: "100%",
         minHeight: 120,
         p: 2,
       }}
@@ -164,10 +161,8 @@ function AuthenticatorCount({ type }) {
     // Outer page spacing wrapper.
     <Paper
       sx={{
-        width: {
-          xs: "100%",
-          sm: 200,
-        },
+        width: "100%",
+        height: "100%",
         minHeight: 120,
         p: 2,
       }}
@@ -236,13 +231,20 @@ export default function Dashboard() {
             Resources
           </Typography>
           <Divider sx={{ mb: 2 }} />
-          <Grid container spacing={1} sx={{ mb: 2 }}>
+          <Box
+            sx={{
+              mb: 2,
+              display: "grid",
+              gap: 2,
+              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+            }}
+          >
             {Object.keys(resourceTypes()).map((key) => (
-              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={key}>
+              <Box key={key}>
                 <ResourceCount title={resourceTypes()[key]} type={key} />
-              </Grid>
+              </Box>
             ))}
-          </Grid>
+          </Box>
         </Box>
 
         <Box sx={{ mb: 2, p: 2, flexWrap: "wrap" }}>
@@ -251,13 +253,20 @@ export default function Dashboard() {
           </Typography>
           <Divider sx={{ mb: 2 }} />
 
-          <Grid container spacing={1} sx={{ mb: 2 }}>
+          <Box
+            sx={{
+              mb: 2,
+              display: "grid",
+              gap: 2,
+              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+            }}
+          >
             {Object.keys(authenticatorTypes()).map((key) => (
-              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={key}>
+              <Box key={key}>
                 <AuthenticatorCount type={authenticatorTypes()[key]} />
-              </Grid>
+              </Box>
             ))}
-          </Grid>
+          </Box>
         </Box>
       </Container>
     </Box>
