@@ -120,6 +120,10 @@ export default function PolicyLoad() {
     clearErrors();
     setLoading(true);
     setError("");
+    setPolicyResponse(null);
+    setResponseStatus(null);
+    setCreatedItems([]);
+    setDeletedItems([]);
 
     try {
       // TODO: Call policyService.loadPolicy(policyText, dryRun)

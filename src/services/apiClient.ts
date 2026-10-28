@@ -11,33 +11,22 @@ interface RequestOptions {
   suppressUnauthorizedRedirect?: boolean;
 }
 
-export interface PolicyErrorResponse {
-  status: string;
-  errors: PolicyError[];
-}
-
-export interface PolicyError {
-  line: number;
-  column: number;
-  message: string;
-  context: PolicyErrorContext;
-}
-
-export interface PolicyErrorContext {
-  policy_id: string;
-  offending_lines: number[];
-}
-
 export interface ApiErrorResponse {
   error: {
-    code: string;
-    message: string;
-    target: string;
-    details: {
-      code: string;
-      target: string;
-      message: string;
-    };
+    code?: string | number;
+    message?: string;
+    target?: string;
+    details?:
+      | {
+          code?: string | number;
+          target?: string;
+          message?: string;
+        }
+      | Array<{
+          code?: string | number;
+          target?: string;
+          message?: string;
+        }>;
   };
 }
 
@@ -51,26 +40,6 @@ interface TextRequestOptions extends RequestOptions {
 
 const ACCESS_TOKEN_STORAGE_KEY = "conjur.accessToken";
 
-function handleUnauthorized(path: string, options: RequestOptions): never {
-  if (!options.suppressUnauthorizedRedirect) {
-    localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
-    window.location.href = "/token-expired";
-  }
-
-  throw new ApiError(
-    {
-      error: {
-        code: "401",
-        message: "Unauthorized",
-        target: path,
-        details: { code: "401", target: path, message: "Unauthorized" },
-      },
-    },
-    401,
-    `${path} failed: 401 Unauthorized`,
-  );
-}
-
 export class ApiError<T = unknown> extends Error {
   response: T;
   status: number;
@@ -83,16 +52,42 @@ export class ApiError<T = unknown> extends Error {
   }
 }
 
+function getDetailFromParsedResponse(response: unknown): string | null {
+  if (!response || typeof response !== "object") {
+    return null;
+  }
+
+  const responseRecord = response as Record<string, unknown>;
+  const message = responseRecord.message;
+  if (typeof message === "string" && message.trim()) {
+    return message;
+  }
+
+  const error = responseRecord.error;
+  if (!error || typeof error !== "object") {
+    return null;
+  }
+
+  const errorMessage = (error as Record<string, unknown>).message;
+  if (typeof errorMessage === "string" && errorMessage.trim()) {
+    return errorMessage;
+  }
+
+  return null;
+}
+
 function apiErrorFromResponse(
   message: string,
   status: number,
   statusText: string,
-): { response: ApiErrorResponse; detail: string } {
+): { response: unknown; detail: string } {
   try {
-    const response = JSON.parse(message) as ApiErrorResponse;
+    const response = JSON.parse(message) as unknown;
+    const detailFromPayload = getDetailFromParsedResponse(response);
+
     return {
       response,
-      detail: response?.error?.message || message || `${status} ${statusText || "error"}`,
+      detail: detailFromPayload || message || `${status} ${statusText || "error"}`,
     };
   } catch {
     const detail = message || `${status} ${statusText || "error"}`;
@@ -110,6 +105,33 @@ function apiErrorFromResponse(
   }
 }
 
+async function throwApiError(path: string, response: Response): Promise<never> {
+  const message = await response.text();
+  const { response: apiError, detail } = apiErrorFromResponse(
+    message,
+    response.status,
+    response.statusText,
+  );
+
+  throw new ApiError(
+    apiError,
+    response.status,
+    `${path} failed: ${response.status} ${detail}`,
+  );
+}
+
+function rethrowRequestError(path: string, error: unknown, log: boolean = false): never {
+  if (error instanceof ApiError) {
+    throw error;
+  }
+
+  if (error instanceof Error) {
+    throw new Error(`API request failed for ${path}: ${error.message}`);
+  }
+
+  throw new Error(`API request failed for ${path}`);
+}
+
 function buildUrl(path: string, query?: object) {
   const url = new URL(path, API_BASE_URL || window.location.origin);
   if (query) {
@@ -121,6 +143,15 @@ function buildUrl(path: string, query?: object) {
   }
 
   return API_BASE_URL ? url.toString() : `${url.pathname}${url.search}`;
+}
+
+function handleUnauthorized(options: RequestOptions): never {
+  localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
+  if (!options.suppressUnauthorizedRedirect) {
+    window.location.href = "/token-expired";
+  }
+
+  throw new Error("Unauthorized");
 }
 
 async function request(
@@ -159,21 +190,11 @@ export async function apiRequestJson<T>(
     });
 
     if (response.status === 401) {
-      handleUnauthorized(path, options);
+      handleUnauthorized(options);
     }
 
     if (!response.ok) {
-      const message = await response.text();
-      const { response: apiError, detail } = apiErrorFromResponse(
-        message,
-        response.status,
-        response.statusText,
-      );
-      throw new ApiError(
-        apiError,
-        response.status,
-        `${path} failed: ${response.status} ${detail}`,
-      );
+      return await throwApiError(path, response);
     }
 
     if (response.status === 204) {
@@ -182,16 +203,7 @@ export async function apiRequestJson<T>(
 
     return (await response.json()) as T;
   } catch (error) {
-    if (error instanceof ApiError) {
-      throw error;
-    }
-
-    if (error instanceof Error) {
-      console.error("API request error:", error);
-      throw new Error(`API request failed for ${path}: ${error.message}`);
-    }
-
-    throw new Error(`API request failed for ${path}`);
+    rethrowRequestError(path, error, true);
   }
 }
 
@@ -210,92 +222,20 @@ export async function apiRequestText(
     });
 
     if (response.status === 401) {
-      handleUnauthorized(path, options);
+      handleUnauthorized(options);
     }
 
     if (!response.ok) {
-      const message = await response.text();
-      const { response: apiError, detail } = apiErrorFromResponse(
-        message,
-        response.status,
-        response.statusText,
-      );
-      throw new ApiError(
-        apiError,
-        response.status,
-        `${path} failed: ${response.status} ${detail}`,
-      );
+      return await throwApiError(path, response);
     }
 
     if (response.status === 204) {
       return "";
     }
 
-    return await response.text();
+    return response.text();
   } catch (error) {
-    if (error instanceof ApiError) {
-      throw error;
-    }
-    if (error instanceof Error) {
-      throw new Error(`API request failed for ${path}: ${error.message}`);
-    }
-
-    throw new Error(`API request failed for ${path}`);
-  }
-}
-
-export async function apiRequestTextFullResponse(
-  path: string,
-  options: TextRequestOptions = {},
-): Promise<{ status: number; data: string }> {
-  try {
-    const response = await request(path, {
-      ...options,
-      headers: {
-        ...(options.body !== undefined ? { "Content-Type": "text/plain" } : {}),
-        ...options.headers,
-      },
-      body: options.body,
-    });
-
-    if (response.status === 401) {
-      handleUnauthorized(path, options);
-    }
-
-    if (!response.ok) {
-      const message = await response.text();
-      if (options.dryRun && response.status === 422) {
-        const apiError = JSON.parse(message) as PolicyErrorResponse;
-        throw new ApiError(apiError, response.status);
-      }
-
-      const { response: apiError, detail } = apiErrorFromResponse(
-        message,
-        response.status,
-        response.statusText,
-      );
-      throw new ApiError(
-        apiError,
-        response.status,
-        `${path} failed: ${response.status} ${detail}`,
-      );
-    }
-
-    if (response.status === 204) {
-      return { status: 204, data: "" };
-    }
-
-    return { status: response.status, data: await response.text() };
-  } catch (error) {
-    if (error instanceof ApiError) {
-      throw error;
-    }
-
-    if (error instanceof Error) {
-      throw new Error(`API request failed for ${path}: ${error.message}`);
-    }
-
-    throw new Error(`API request failed for ${path}`);
+    rethrowRequestError(path, error);
   }
 }
 

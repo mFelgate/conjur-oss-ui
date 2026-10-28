@@ -3,7 +3,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   ApiError,
-  apiRequestTextFullResponse,
+  apiRequestText,
 } from "../src/services/apiClient";
 
 // This suite documents known defects. It is intentionally excluded from `npm test`
@@ -43,7 +43,7 @@ describe("known API client issues", () => {
     );
 
     await expect(
-      apiRequestTextFullResponse("/policies/account/policy/root", {
+      apiRequestText("/policies/account/policy/root", {
         dryRun: true,
       }),
     ).rejects.toMatchObject({

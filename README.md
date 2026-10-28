@@ -22,6 +22,7 @@ The goal is to provide a simple developer-friendly interface for learning, testi
 - [Development Environment](#development-environment)
 - [Conjur OSS compatibility](#conjur-oss-compatibility)
 - [Screenshots](#screenshots)
+  - [Profile](#profile)
   - [Resources](#resources-1)
   - [Secrets](#secrets-1)
   - [Groups](#groups-1)
@@ -175,6 +176,15 @@ View an overview of the Conjur environment and common administration workflows.
 View an overview of the Conjur environment and common administration workflows.
 
 ![Dashboard](./screenshots/dashboard.png)
+
+---
+
+### Profile
+
+#### API Key Rotation and Password Changes
+Use the profile page to rotate API keys and change your password.
+
+![Profile](./screenshots/profile.png)
 
 ---
 

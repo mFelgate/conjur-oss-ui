@@ -20,8 +20,10 @@ describe("secretsService", () => {
     );
   });
 
-  it("posts a plain-text secret value", () => {
-    secretsService.set("variable", "folder/value", "new secret");
+  it("posts a plain-text secret value", async () => {
+    apiRequestTextMock.mockResolvedValue("ok");
+
+    await secretsService.set("variable", "folder/value", "new secret");
 
     expect(apiRequestTextMock).toHaveBeenCalledWith(
       `/secrets/${account}/variable/folder%2Fvalue`,

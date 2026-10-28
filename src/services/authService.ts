@@ -1,4 +1,4 @@
-import { apiRequest, apiRequestText } from "./apiClient";
+import { ApiError, apiRequest, apiRequestText } from "./apiClient";
 import type {
   AccessTokenResponse,
   ConjurAccessTokenRequest,
@@ -41,7 +41,7 @@ export const authService = {
   async passwordLogin(account: string, login: string, password: string) {
     const path = `/authn/${encodeURIComponent(account)}/login`;
 
-     const apiKey = await apiRequestText(path, {
+    const apiKey = await apiRequestText(path, {
       method: "GET",
       headers: {
         Authorization: "Basic " + toBase64(login + ":" + password),
@@ -90,6 +90,18 @@ export const authService = {
       headers: {
         accept: 'application/json',
       },
+    }).catch((error) => {
+      if (error instanceof ApiError) {
+        if (error.status === 404) {
+          throw new Error("Role not found for API key rotation.");
+        }
+
+        if (error.status === 401) {
+          throw new Error("Unauthorized to rotate API key for this role.");
+        }
+      }
+
+      throw error;
     });
   },
 
@@ -103,6 +115,22 @@ export const authService = {
         "Content-Type": "text/plain",
       },
       body: newPassword,
+    }).catch((error) => {
+      if (error instanceof ApiError) {
+        if (error.status === 401) {
+          throw new Error("Current password/API key is invalid.");
+        }
+
+        if (error.status === 404) {
+          throw new Error(`User '${login}' not found.`);
+        }
+
+        if (error.status === 422) {
+          throw new Error("Invalid password update request.");
+        }
+      }
+
+      throw error;
     });
   },
 
