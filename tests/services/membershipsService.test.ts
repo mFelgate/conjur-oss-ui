@@ -1,8 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("../../src/services/apiClient", () => ({ apiRequest: vi.fn() }));
+vi.mock("../../src/services/apiClient", async () => {
+  const actual = await vi.importActual<typeof import("../../src/services/apiClient")>(
+    "../../src/services/apiClient",
+  );
 
-import { apiRequest } from "../../src/services/apiClient";
+  return {
+    ...actual,
+    apiRequest: vi.fn(),
+  };
+});
+
+import { ApiError, apiRequest } from "../../src/services/apiClient";
 import { CONJUR_ACCOUNT } from "../../src/config";
 import { membershipsService } from "../../src/services/membershipsService";
 
@@ -11,10 +20,13 @@ const headers = { accept: "application/json" };
 const account = encodeURIComponent(CONJUR_ACCOUNT);
 
 describe("membershipsService", () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    apiRequestMock.mockResolvedValue(undefined as never);
+  });
 
-  it("builds a role request", () => {
-    membershipsService.getRole("group", "team/a", { limit: 10 });
+  it("builds a role request", async () => {
+    await membershipsService.getRole("group", "team/a", { limit: 10 });
 
     expect(apiRequestMock).toHaveBeenCalledWith(`/roles/${account}/group/team%2Fa`, {
       query: { limit: 10 },
@@ -22,11 +34,11 @@ describe("membershipsService", () => {
     });
   });
 
-  it("adds the correct query flag for each membership view", () => {
-    membershipsService.listMembers("group", "team", { offset: 5 });
-    membershipsService.listMemberships("group", "team");
-    membershipsService.listAllMemberships("group", "team");
-    membershipsService.getGraph("group", "team");
+  it("adds the correct query flag for each membership view", async () => {
+    await membershipsService.listMembers("group", "team", { offset: 5 });
+    await membershipsService.listMemberships("group", "team");
+    await membershipsService.listAllMemberships("group", "team");
+    await membershipsService.getGraph("group", "team");
 
     expect(apiRequestMock).toHaveBeenNthCalledWith(1, `/roles/${account}/group/team`, {
       query: { offset: 5, members: "true" },
@@ -46,9 +58,9 @@ describe("membershipsService", () => {
     });
   });
 
-  it("adds and removes a member", () => {
-    membershipsService.addMember("group", "team", "conjur:user:alice");
-    membershipsService.removeMember("group", "team", "conjur:user:alice");
+  it("adds and removes a member", async () => {
+    await membershipsService.addMember("group", "team", "conjur:user:alice");
+    await membershipsService.removeMember("group", "team", "conjur:user:alice");
 
     expect(apiRequestMock).toHaveBeenNthCalledWith(1, `/roles/${account}/group/team`, {
       method: "POST",
@@ -60,5 +72,23 @@ describe("membershipsService", () => {
       query: { members: "true", member: "conjur:user:alice" },
       headers,
     });
+  });
+
+  it("surfaces Conjur membership error messages", async () => {
+    apiRequestMock.mockRejectedValue(
+      new ApiError(
+        {
+          error: {
+            code: "conflict",
+            message: "Role is already a member",
+          },
+        },
+        409,
+      ),
+    );
+
+    await expect(
+      membershipsService.addMember("group", "team", "conjur:user:alice"),
+    ).rejects.toThrow("Role is already a member");
   });
 });

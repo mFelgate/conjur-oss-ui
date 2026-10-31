@@ -1,13 +1,3 @@
-export interface Authenticator {
-  id: string
-  kind: string
-  enabled: boolean
-}
-
-export interface ListAuthenticatorsRequest {
-  policyBranch?: string
-}
-
 export type AuthenticatorType =
   | 'jwt'
   | 'oidc'
@@ -100,10 +90,6 @@ export interface CreateAuthenticatorV2Request {
   owner?: AuthenticatorOwnerResponse
 }
 
-export interface UpdateAuthenticatorV2Request {
-  enabled: boolean
-}
-
 export interface ListAuthenticatorsV2QueryRequest {
   filter?: string
   search?: string
@@ -125,19 +111,6 @@ export interface AuthenticatorV2Response {
 export interface AuthenticatorsV2ListEnvelopeResponse {
   authenticators: AuthenticatorV2Response[]
   count: number
-}
-
-export type AuthenticatorsV2ListResponse =
-  | AuthenticatorV2Response[]
-  | AuthenticatorsV2ListEnvelopeResponse
-
-export interface EnableAuthenticatorSettingRequest {
-  enabled: boolean
-}
-
-export interface AuthenticatorStatusResponse {
-  status: string
-  error: string
 }
 
 export interface AuthenticatorsIndexResponse {

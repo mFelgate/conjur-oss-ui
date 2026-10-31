@@ -44,12 +44,19 @@ describe("API client error handling", () => {
       ),
     );
 
-    await expect(apiRequestJson("/resources/account")).rejects.toMatchObject({
-      name: "ApiError",
-      status: 403,
-      message: "/resources/account failed: 403 Access denied",
-      response: { error: { code: "CONJ00001", message: "Access denied" } },
-    });
+    try {
+      await apiRequestJson("/resources/account");
+      throw new Error("Expected request to fail");
+    } catch (error) {
+      expect(error).toBeInstanceOf(ApiError);
+      expect((error as ApiError).status).toBe(403);
+      expect((error as ApiError).message).toBe(
+        "/resources/account failed: 403 Forbidden",
+      );
+      expect((error as ApiError).response).toMatchObject({
+        error: { code: "CONJ00001", message: "Access denied" },
+      });
+    }
   });
 
   it("turns an empty JSON error response into a readable ApiError", async () => {
@@ -65,11 +72,11 @@ describe("API client error handling", () => {
       throw new Error("Expected request to fail");
     } catch (error) {
       expect(error).toBeInstanceOf(ApiError);
-      expect(error).toMatchObject({
-        status: 404,
-        message: "/authenticators/account failed: 404 404 Not Found",
-        response: { error: { code: "404", message: "404 Not Found" } },
-      });
+      expect((error as ApiError).status).toBe(404);
+      expect((error as ApiError).message).toBe(
+        "/authenticators/account failed: 404 Not Found",
+      );
+      expect((error as ApiError).response).toBeNull();
     }
   });
 
@@ -84,10 +91,16 @@ describe("API client error handling", () => {
       ),
     );
 
-    await expect(apiRequestText("/resources/account")).rejects.toMatchObject({
-      name: "ApiError",
-      status: 502,
-      message: "/resources/account failed: 502 Reverse proxy unavailable",
-    });
+    try {
+      await apiRequestText("/resources/account");
+      throw new Error("Expected request to fail");
+    } catch (error) {
+      expect(error).toBeInstanceOf(ApiError);
+      expect((error as ApiError).status).toBe(502);
+      expect((error as ApiError).message).toBe(
+        "/resources/account failed: 502 Bad Gateway",
+      );
+      expect((error as ApiError).response).toBe("Reverse proxy unavailable");
+    }
   });
 });

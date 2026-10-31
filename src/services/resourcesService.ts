@@ -1,5 +1,6 @@
-import { apiRequest } from './apiClient'
+import { ApiError, apiRequest, getConjurErrorMessage } from './apiClient'
 import type {
+  ConjurErrorResponse,
   ResourceResponse,
   ResourcesQueryRequest,
   ResourcesResponse,
@@ -26,6 +27,17 @@ export const resourcesService = {
       headers: {
         accept: 'application/json',
       },
+    }).catch((error) => {
+      if (error instanceof ApiError) {
+        const response = (error as ApiError<ConjurErrorResponse>).response;
+        const message = getConjurErrorMessage(response);
+
+        if (message) {
+          throw new Error(message);
+        }
+      }
+
+      throw error;
     })
   }
 }

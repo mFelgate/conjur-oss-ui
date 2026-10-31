@@ -24,7 +24,6 @@ export default function PolicyLoad() {
   const [dryRun, setDryRun] = useState(true);
   const [loading, setLoading] = useState(false);
   const [policyResponse, setPolicyResponse] = useState(null);
-  const [responseStatus, setResponseStatus] = useState(null);
   const [createdItems, setCreatedItems] = useState([]);
   const [deletedItems, setDeletedItems] = useState([]);
   const [branch, setBranch] = useState("root");
@@ -49,7 +48,7 @@ export default function PolicyLoad() {
     const model = editor.getModel();
     if (!model) return;
 
-    monaco.editor.setModelMarkers(model, "dry-run", []);
+    monaco.editor.setModelMarkers(model, "policy-load", []);
     decorationsRef.current = editor.deltaDecorations(
       decorationsRef.current,
       [],
@@ -58,7 +57,6 @@ export default function PolicyLoad() {
 
   const resetPolicyPreview = () => {
     setPolicyResponse(null);
-    setResponseStatus(null);
     setCreatedItems([]);
     setDeletedItems([]);
     setError("");
@@ -96,7 +94,58 @@ export default function PolicyLoad() {
       severity: monaco.MarkerSeverity.Error,
     }));
 
-    monaco.editor.setModelMarkers(model, "dry-run", markers);
+    monaco.editor.setModelMarkers(model, "policy-load", markers);
+  };
+
+  const showApplyError = (err) => {
+    const monaco = monacoRef.current;
+    const editor = editorRef.current;
+
+    if (!monaco || !editor) return;
+
+    const model = editor.getModel();
+    if (!model) return;
+
+    const inner = err?.response?.error?.innererror;
+    const message = err?.response?.error?.message;
+    const line = Number(inner?.line);
+    const column = Number(inner?.column);
+
+    if (!Number.isFinite(line) || line < 1) {
+      return;
+    }
+
+    const startColumn = Number.isFinite(column) ? Math.max(1, column + 1) : 1;
+
+    const errorDecoration = [
+      {
+        range: new monaco.Range(line, 1, line, 1),
+        options: {
+          isWholeLine: true,
+          className: "errorLine",
+        },
+      },
+    ];
+
+    decorationsRef.current = editor.deltaDecorations(
+      decorationsRef.current,
+      errorDecoration,
+    );
+
+    monaco.editor.setModelMarkers(model, "policy-load", [
+      {
+        startLineNumber: line,
+        startColumn,
+        endLineNumber: line,
+        endColumn: startColumn + 1,
+        message: message || "Policy load failed.",
+        severity: monaco.MarkerSeverity.Error,
+      },
+    ]);
+
+    editor.revealLineInCenter(line);
+    editor.setPosition({ lineNumber: line, column: startColumn });
+    editor.focus();
   };
 
   const getDryRunErrorMessage = (err) => {
@@ -116,12 +165,24 @@ export default function PolicyLoad() {
     return "Dry run validation failed.";
   };
 
+  const getApplyErrorMessage = (err) => {
+    const message = err?.response?.error?.message;
+    if (message) {
+      return message;
+    }
+
+    if (err instanceof Error && err.message) {
+      return err.message;
+    }
+
+    return "Failed to load policy.";
+  };
+
   const handleSubmit = async () => {
     clearErrors();
     setLoading(true);
     setError("");
     setPolicyResponse(null);
-    setResponseStatus(null);
     setCreatedItems([]);
     setDeletedItems([]);
 
@@ -133,19 +194,19 @@ export default function PolicyLoad() {
         method,
         dryRun,
       );
-      setPolicyResponse(response.data);
-      setResponseStatus(response.status);
+      setPolicyResponse(response);
 
       if (dryRun) {
-        setCreatedItems(response.data.created?.items ?? []);
-        setDeletedItems(response.data.deleted?.items ?? []);
+        setCreatedItems(response.created?.items ?? []);
+        setDeletedItems(response.deleted?.items ?? []);
       }
     } catch (err) {
       if (dryRun) {
         showErrors(err);
         setError(getDryRunErrorMessage(err));
       } else {
-        setError(err instanceof Error ? err.message : "Failed to load policy.");
+        showApplyError(err);
+        setError(getApplyErrorMessage(err));
       }
     } finally {
       setLoading(false);
@@ -252,7 +313,7 @@ export default function PolicyLoad() {
             </Paper>
           )}
 
-          {!error && policyResponse && responseStatus === 200 && (
+          {!error && policyResponse && dryRun && (
             <Stack spacing={2}>
               <PolicyCreated items={createdItems} />
               <PolicyDeleted items={deletedItems} />

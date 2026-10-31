@@ -71,3 +71,41 @@ The OIDC authentication flow is:
 4. Conjur validates the identity with Keycloak.
 5. Conjur returns an access token to the React UI.
 6. The React UI uses the access token for API requests.
+
+### OIDC authenticator settings (Conjur v2)
+
+After `keycloak_setup.sh` runs, configure the OIDC authenticator through the UI form
+using the values below.
+
+| Form Field | Value |
+| --- | --- |
+| Type | `oidc` |
+| Name | `ui` |
+| Enabled | `true` |
+| provider_uri | `http://host.docker.internal:8080/realms/conjur-test` |
+| client_id | `conjur-app` |
+| client_secret | `conjur-secret` |
+| redirect_uri | `http://localhost:5173/login/callback` |
+| provider_scope | `openid profile email` |
+| claim_mapping | `preferred_username` |
+| description (annotation) | `Local dev OIDC for Conjur React UI + Keycloak` |
+
+> Note: `keycloak_setup.sh` configures Keycloak (realm, client, user). It does not create the Conjur authenticator resource.
+
+### User policy for OIDC login
+
+If the authenticator is managed through v2 and the `apps` / `operators` groups already have access,
+you only need to add users to those groups.
+
+```yaml
+- !user testuser
+
+- !grant
+  role: !group conjur/authn-oidc/ui/apps
+  member: !user testuser
+
+# optional second membership
+- !grant
+  role: !group conjur/authn-oidc/ui/operators
+  member: !user testuser
+```

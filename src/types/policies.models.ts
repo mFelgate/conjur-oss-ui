@@ -26,17 +26,21 @@ export interface PolicyVersionResponse {
   version: number
 }
 
-export interface LoadedPolicyResponse {
+export interface AppliedPolicyLoadResponse {
   created_roles: Record<string, { id: string; api_key: string }>
   version: number
 }
 
-export interface PolicyLoadResponse {
+export interface DryRunPolicyLoadResponse {
   status: string;
   created: PolicyChangeSet;
   updated: PolicyUpdateSet;
   deleted: PolicyChangeSet;
 }
+
+export type PolicyLoadResponse =
+  | DryRunPolicyLoadResponse
+  | AppliedPolicyLoadResponse;
 
 export interface PolicyChangeSet {
   items: PolicyResource[];

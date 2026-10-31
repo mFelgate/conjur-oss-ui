@@ -1,10 +1,37 @@
-import { ApiError, apiRequest, apiRequestText } from "./apiClient";
+import {
+  ApiError,
+  apiRequest,
+  apiRequestText,
+} from "./apiClient";
 import type {
-  AccessTokenResponse,
   ConjurAccessTokenRequest,
   WhoAmIResponse,
 } from "../types";
 import { CONJUR_ACCOUNT } from "../config";
+
+interface AuthErrorResponse {
+  message?: string;
+}
+
+function throwAuthErrorMessage(error: ApiError<AuthErrorResponse | string>): never {
+  const response = error.response;
+
+  // Auth endpoints may return either plain text or JSON error messages.
+  // Normalize both formats into a single Error.message for the UI.
+  if (typeof response === "string" && response.trim()) {
+    throw new Error(response.trim());
+  }
+
+  if (response && typeof response === "object") {
+    const message = response.message;
+    if (typeof message === "string" && message.trim()) {
+      throw new Error(message);
+    }
+  }
+
+  throw error;
+}
+
 function toBase64(value: string): string {
   const bytes = new TextEncoder().encode(value);
   let binary = "";
@@ -99,6 +126,8 @@ export const authService = {
         if (error.status === 401) {
           throw new Error("Unauthorized to rotate API key for this role.");
         }
+
+        throwAuthErrorMessage(error as ApiError<AuthErrorResponse | string>);
       }
 
       throw error;
@@ -128,6 +157,8 @@ export const authService = {
         if (error.status === 422) {
           throw new Error("Invalid password update request.");
         }
+
+        throwAuthErrorMessage(error as ApiError<AuthErrorResponse | string>);
       }
 
       throw error;

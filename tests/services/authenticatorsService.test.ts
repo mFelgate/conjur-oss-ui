@@ -1,8 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("../../src/services/apiClient", () => ({ apiRequest: vi.fn() }));
+vi.mock("../../src/services/apiClient", async () => {
+  const actual = await vi.importActual<typeof import("../../src/services/apiClient")>(
+    "../../src/services/apiClient",
+  );
 
-import { apiRequest } from "../../src/services/apiClient";
+  return {
+    ...actual,
+    apiRequest: vi.fn(),
+  };
+});
+
+import { ApiError, apiRequest } from "../../src/services/apiClient";
 import { CONJUR_ACCOUNT } from "../../src/config";
 import { authenticatorsService } from "../../src/services/authenticatorsService";
 
@@ -11,7 +20,10 @@ const v2Headers = { accept: "application/x.secretsmgr.v2beta+json" };
 const account = encodeURIComponent(CONJUR_ACCOUNT);
 
 describe("authenticatorsService", () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    apiRequestMock.mockResolvedValue(undefined as never);
+  });
 
   it("retrieves OIDC providers for the configured account", () => {
     authenticatorsService.providers();
@@ -61,5 +73,11 @@ describe("authenticatorsService", () => {
       `/authenticators/${account}/oidc/ui%2Fservice`,
       { method: "DELETE", headers: v2Headers },
     );
+  });
+
+  it("surfaces v2 error message payloads", async () => {
+    apiRequestMock.mockRejectedValue(new ApiError({ code: "403", message: "Forbidden" }, 403));
+
+    await expect(authenticatorsService.get("oidc", "ui")).rejects.toThrow("Forbidden");
   });
 });

@@ -1,8 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("../../src/services/apiClient", () => ({ apiRequest: vi.fn() }));
+vi.mock("../../src/services/apiClient", async () => {
+  const actual = await vi.importActual<typeof import("../../src/services/apiClient")>(
+    "../../src/services/apiClient",
+  );
 
-import { apiRequest } from "../../src/services/apiClient";
+  return {
+    ...actual,
+    apiRequest: vi.fn(),
+  };
+});
+
+import { ApiError, apiRequest } from "../../src/services/apiClient";
 import { CONJUR_ACCOUNT } from "../../src/config";
 import { resourcesService } from "../../src/services/resourcesService";
 
@@ -28,12 +37,38 @@ describe("resourcesService", () => {
     });
   });
 
-  it("encodes a resource identifier when retrieving details", () => {
-    resourcesService.get("variable", "folder/credential name");
+  it("encodes a resource identifier when retrieving details", async () => {
+    apiRequestMock.mockResolvedValue({} as never);
+
+    await resourcesService.get("variable", "folder/credential name");
 
     expect(apiRequestMock).toHaveBeenCalledWith(
       `/resources/${account}/variable/folder%2Fcredential%20name`,
       { headers: { accept: "application/json" } },
+    );
+  });
+
+  it("surfaces Conjur resource error message for missing resources", async () => {
+    apiRequestMock.mockRejectedValue(
+      new ApiError(
+        {
+          error: {
+            code: "not_found",
+            message: "User 'testuser' not found in account 'cucumber'",
+            target: "user",
+            details: {
+              code: "not_found",
+              target: "id",
+              message: "cucumber:user:testuser",
+            },
+          },
+        },
+        404,
+      ),
+    );
+
+    await expect(resourcesService.get("user", "testuser")).rejects.toThrow(
+      "User 'testuser' not found in account 'cucumber'",
     );
   });
 });

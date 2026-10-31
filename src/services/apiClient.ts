@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "../config";
+import type { ConjurErrorResponse, ConjurV2ErrorResponse } from "../types";
 
 
 export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
@@ -9,25 +10,6 @@ interface RequestOptions {
   headers?: Record<string, string>;
   dryRun?: boolean;
   suppressUnauthorizedRedirect?: boolean;
-}
-
-export interface ApiErrorResponse {
-  error: {
-    code?: string | number;
-    message?: string;
-    target?: string;
-    details?:
-      | {
-          code?: string | number;
-          target?: string;
-          message?: string;
-        }
-      | Array<{
-          code?: string | number;
-          target?: string;
-          message?: string;
-        }>;
-  };
 }
 
 interface JsonRequestOptions extends RequestOptions {
@@ -52,84 +34,59 @@ export class ApiError<T = unknown> extends Error {
   }
 }
 
-function getDetailFromParsedResponse(response: unknown): string | null {
-  if (!response || typeof response !== "object") {
+export function getConjurErrorMessage(
+  response: ConjurErrorResponse | null | undefined,
+): string | null {
+  if (!response) {
     return null;
   }
 
-  const responseRecord = response as Record<string, unknown>;
-  const message = responseRecord.message;
-  if (typeof message === "string" && message.trim()) {
-    return message;
-  }
-
-  const error = responseRecord.error;
-  if (!error || typeof error !== "object") {
-    return null;
-  }
-
-  const errorMessage = (error as Record<string, unknown>).message;
-  if (typeof errorMessage === "string" && errorMessage.trim()) {
-    return errorMessage;
-  }
-
-  return null;
+  const envelopeMessage = response.error?.message;
+  return typeof envelopeMessage === "string"
+    ? envelopeMessage.trim() || null
+    : null;
 }
 
-function apiErrorFromResponse(
-  message: string,
-  status: number,
-  statusText: string,
-): { response: unknown; detail: string } {
-  try {
-    const response = JSON.parse(message) as unknown;
-    const detailFromPayload = getDetailFromParsedResponse(response);
+// Kept as a named export for v2 callers and hot-reloaded modules that still
+// reference the earlier helper name.
+export function getConjurV2ErrorMessage(
+  response: ConjurV2ErrorResponse | null | undefined,
+): string | null {
+  const message = response?.message;
+  return typeof message === "string" ? message.trim() || null : null;
+}
 
-    return {
-      response,
-      detail: detailFromPayload || message || `${status} ${statusText || "error"}`,
-    };
+export function getConjurApiErrorMessage(error: unknown): string | null {
+  if (!(error instanceof ApiError)) {
+    return null;
+  }
+
+  const response = (error as ApiError<ConjurErrorResponse>).response;
+  return getConjurErrorMessage(response);
+}
+
+function parseErrorResponse(message: string): unknown {
+  if (!message) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(message) as unknown;
   } catch {
-    const detail = message || `${status} ${statusText || "error"}`;
-    return {
-      response: {
-        error: {
-          code: String(status),
-          message: detail,
-          target: "",
-          details: { code: "", target: "", message: detail },
-        },
-      },
-      detail,
-    };
+    return message;
   }
 }
 
 async function throwApiError(path: string, response: Response): Promise<never> {
   const message = await response.text();
-  const { response: apiError, detail } = apiErrorFromResponse(
-    message,
-    response.status,
-    response.statusText,
-  );
+  const apiError = parseErrorResponse(message);
+  const detail = response.statusText || "error";
 
   throw new ApiError(
     apiError,
     response.status,
     `${path} failed: ${response.status} ${detail}`,
   );
-}
-
-function rethrowRequestError(path: string, error: unknown, log: boolean = false): never {
-  if (error instanceof ApiError) {
-    throw error;
-  }
-
-  if (error instanceof Error) {
-    throw new Error(`API request failed for ${path}: ${error.message}`);
-  }
-
-  throw new Error(`API request failed for ${path}`);
 }
 
 function buildUrl(path: string, query?: object) {
@@ -174,69 +131,61 @@ export async function apiRequestJson<T>(
   path: string,
   options: JsonRequestOptions = {},
 ): Promise<T> {
-  try {
-    const response = await request(path, {
-      ...options,
-      headers: {
-        ...(options.body !== undefined && options.body !== null
-          ? { "Content-Type": "application/json" }
-          : {}),
-        ...options.headers,
-      },
-      body:
-        options.body === undefined || options.body === null
-          ? undefined
-          : JSON.stringify(options.body),
-    });
+  const response = await request(path, {
+    ...options,
+    headers: {
+      ...(options.body !== undefined && options.body !== null
+        ? { "Content-Type": "application/json" }
+        : {}),
+      ...options.headers,
+    },
+    body:
+      options.body === undefined || options.body === null
+        ? undefined
+        : JSON.stringify(options.body),
+  });
 
-    if (response.status === 401) {
-      handleUnauthorized(options);
-    }
-
-    if (!response.ok) {
-      return await throwApiError(path, response);
-    }
-
-    if (response.status === 204) {
-      return undefined as T;
-    }
-
-    return (await response.json()) as T;
-  } catch (error) {
-    rethrowRequestError(path, error, true);
+  if (response.status === 401) {
+    handleUnauthorized(options);
   }
+
+  if (!response.ok) {
+    return await throwApiError(path, response);
+  }
+
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
+  return (await response.json()) as T;
 }
 
 export async function apiRequestText(
   path: string,
   options: TextRequestOptions = {},
 ): Promise<string> {
-  try {
-    const response = await request(path, {
-      ...options,
-      headers: {
-        ...(options.body !== undefined ? { "Content-Type": "text/plain" } : {}),
-        ...options.headers,
-      },
-      body: options.body,
-    });
+  const response = await request(path, {
+    ...options,
+    headers: {
+      ...(options.body !== undefined ? { "Content-Type": "text/plain" } : {}),
+      ...options.headers,
+    },
+    body: options.body,
+  });
 
-    if (response.status === 401) {
-      handleUnauthorized(options);
-    }
-
-    if (!response.ok) {
-      return await throwApiError(path, response);
-    }
-
-    if (response.status === 204) {
-      return "";
-    }
-
-    return response.text();
-  } catch (error) {
-    rethrowRequestError(path, error);
+  if (response.status === 401) {
+    handleUnauthorized(options);
   }
+
+  if (!response.ok) {
+    return await throwApiError(path, response);
+  }
+
+  if (response.status === 204) {
+    return "";
+  }
+
+  return response.text();
 }
 
 // Backward-compatible alias for existing JSON callers.

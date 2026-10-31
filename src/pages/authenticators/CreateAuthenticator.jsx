@@ -61,7 +61,7 @@ export default function CreateAuthenticator() {
   async function submit(event) {
     event.preventDefault();
 
-    const payload = {
+    let payload = {
       type: authenticatorSchemas[form.type].authType,
       name: form.name,
       enabled: form.enabled,
@@ -148,6 +148,17 @@ export default function CreateAuthenticator() {
         }
       }
 
+    if (payload.type === "gcp") {
+      const { data, ...rest } = payload; 
+      rest.name = "default"; // Set the name to "default" for GCP authenticators
+      payload = rest; // Reassign the cleaned object back to payload
+    }
+
+    if (payload.type === "aws") {
+      const { data, ...rest } = payload; 
+      payload = rest; // Reassign the cleaned object back to payload
+    }
+
       const response = await authenticatorsService.create(payload);
       setError(null);
 
@@ -192,6 +203,7 @@ export default function CreateAuthenticator() {
           ))}
         </Select>
 
+      {form.type !== "GCP" && (
         <TextField
           label="Name"
           value={form.name}
@@ -204,6 +216,8 @@ export default function CreateAuthenticator() {
           }
           fullWidth
         />
+        )}  
+        
 
         <FormControlLabel
           control={

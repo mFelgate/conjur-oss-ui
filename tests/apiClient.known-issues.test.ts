@@ -50,7 +50,7 @@ describe("known API client issues", () => {
       name: "ApiError",
       status: 422,
       message:
-        "/policies/account/policy/root failed: 422 422 Unprocessable Entity",
+        "/policies/account/policy/root failed: 422 Unprocessable Entity",
     });
   });
 });

@@ -1,5 +1,6 @@
-import { apiRequest } from './apiClient'
+import { ApiError, apiRequest, getConjurErrorMessage } from './apiClient'
 import type {
+  ConjurErrorResponse,
   RoleGraphResponse,
   RoleMembersResponse,
   RoleResponse,
@@ -19,6 +20,16 @@ export const membershipsService = {
       headers: {
         accept: 'application/json',
       },
+    }).catch((error) => {
+      if (error instanceof ApiError) {
+        const response = (error as ApiError<ConjurErrorResponse>).response;
+        const message = getConjurErrorMessage(response);
+        if (message) {
+          throw new Error(message);
+        }
+      }
+
+      throw error instanceof Error ? error : new Error("Failed to load role.");
     })
   },
 
@@ -31,6 +42,16 @@ export const membershipsService = {
       headers: {
         accept: 'application/json',
       },
+    }).catch((error) => {
+      if (error instanceof ApiError) {
+        const response = (error as ApiError<ConjurErrorResponse>).response;
+        const message = getConjurErrorMessage(response);
+        if (message) {
+          throw new Error(message);
+        }
+      }
+
+      throw error instanceof Error ? error : new Error("Failed to load members.");
     })
   },
 
@@ -43,6 +64,16 @@ export const membershipsService = {
       headers: {
         accept: 'application/json',
       },
+    }).catch((error) => {
+      if (error instanceof ApiError) {
+        const response = (error as ApiError<ConjurErrorResponse>).response;
+        const message = getConjurErrorMessage(response);
+        if (message) {
+          throw new Error(message);
+        }
+      }
+
+      throw error instanceof Error ? error : new Error("Failed to load memberships.");
     })
   },
 
@@ -55,6 +86,16 @@ export const membershipsService = {
       headers: {
         accept: 'application/json',
       },
+    }).catch((error) => {
+      if (error instanceof ApiError) {
+        const response = (error as ApiError<ConjurErrorResponse>).response;
+        const message = getConjurErrorMessage(response);
+        if (message) {
+          throw new Error(message);
+        }
+      }
+
+      throw error instanceof Error ? error : new Error("Failed to load memberships.");
     })
   },
 
@@ -67,6 +108,16 @@ export const membershipsService = {
       headers: {
         accept: 'application/json',
       },
+    }).catch((error) => {
+      if (error instanceof ApiError) {
+        const response = (error as ApiError<ConjurErrorResponse>).response;
+        const message = getConjurErrorMessage(response);
+        if (message) {
+          throw new Error(message);
+        }
+      }
+
+      throw error instanceof Error ? error : new Error("Failed to load membership graph.");
     })
   },
 
@@ -80,6 +131,28 @@ export const membershipsService = {
       headers: {
         accept: 'application/json',
       },
+    }).catch((error) => {
+      if (error instanceof ApiError) {
+        const response = (error as ApiError<ConjurErrorResponse>).response;
+        const message = getConjurErrorMessage(response);
+        if (message) {
+          throw new Error(message);
+        }
+
+        if (error.status === 403) {
+          throw new Error("You are not authorized to modify this group membership.");
+        }
+
+        if (error.status === 404) {
+          throw new Error("Group or member not found.");
+        }
+
+        if (error.status === 409) {
+          throw new Error("Membership conflict: member already exists or state is invalid.");
+        }
+      }
+
+      throw error instanceof Error ? error : new Error("Failed to add member.");
     })
   },
 
@@ -93,6 +166,28 @@ export const membershipsService = {
       headers: {
         accept: 'application/json',
       },
+    }).catch((error) => {
+      if (error instanceof ApiError) {
+        const response = (error as ApiError<ConjurErrorResponse>).response;
+        const message = getConjurErrorMessage(response);
+        if (message) {
+          throw new Error(message);
+        }
+
+        if (error.status === 403) {
+          throw new Error("You are not authorized to modify this group membership.");
+        }
+
+        if (error.status === 404) {
+          throw new Error("Group or member not found.");
+        }
+
+        if (error.status === 409) {
+          throw new Error("Membership conflict: member already exists or state is invalid.");
+        }
+      }
+
+      throw error instanceof Error ? error : new Error("Failed to remove member.");
     })
   },
 }

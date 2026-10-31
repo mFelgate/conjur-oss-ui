@@ -20,13 +20,111 @@ interface PolicyErrorContext {
   offending_lines: number[];
 }
 
-function isPolicyErrorResponse(value: unknown): value is PolicyErrorResponse {
+interface PolicyApplyErrorResponse {
+  error: {
+    code: string;
+    message: string;
+    innererror?: {
+      code: string;
+      filename: string;
+      line: number;
+      column: number;
+    };
+  };
+}
+
+interface PolicyDryRunMessageErrorResponse {
+  error: {
+    code: string;
+    message: string;
+  };
+}
+
+function isPolicyDryRunMessageErrorResponse(
+  value: unknown,
+): value is PolicyDryRunMessageErrorResponse {
   if (!value || typeof value !== "object") {
     return false;
   }
 
   const record = value as Record<string, unknown>;
-  return Array.isArray(record.errors);
+  const error = record.error;
+  if (!error || typeof error !== "object") {
+    return false;
+  }
+
+  const message = (error as Record<string, unknown>).message;
+  return typeof message === "string";
+}
+
+function toPolicyLoadResult(response: string): PolicyLoadResponse {
+  return JSON.parse(response) as PolicyLoadResponse;
+}
+
+async function requestPolicyLoad(
+  path: string,
+  policyContent: string,
+  method: Extract<HttpMethod, "POST" | "PATCH" | "PUT">,
+  dryRun: boolean,
+): Promise<string> {
+  return apiRequestText(path, {
+    method,
+    query: {
+      dryRun,
+    },
+    headers: {
+      accept: "text/plain",
+    },
+    body: policyContent,
+  });
+}
+
+async function runDryRunPolicyLoad(
+  path: string,
+  policyContent: string,
+  method: Extract<HttpMethod, "POST" | "PATCH" | "PUT">,
+): Promise<PolicyLoadResponse> {
+  try {
+    const response = await requestPolicyLoad(path, policyContent, method, true);
+    return toPolicyLoadResult(response);
+  } catch (error) {
+    // Conjur returns structured validation errors for dry-run failures (422).
+    if (error instanceof ApiError && error.status === 422) {
+      const response = error.response as unknown;
+
+      if (isPolicyDryRunMessageErrorResponse(response)) {
+        throw new ApiError(response, error.status, response.error.message);
+      }
+
+      const policyError = (error as ApiError<PolicyErrorResponse>).response;
+
+      throw new ApiError(policyError, error.status, "Dry run validation failed.");
+    }
+
+    throw error;
+  }
+}
+
+async function runApplyPolicyLoad(
+  path: string,
+  policyContent: string,
+  method: Extract<HttpMethod, "POST" | "PATCH" | "PUT">,
+): Promise<PolicyLoadResponse> {
+  try {
+    const response = await requestPolicyLoad(path, policyContent, method, false);
+    return toPolicyLoadResult(response);
+  } catch (error) {
+    if (error instanceof ApiError) {
+      const response = (error as ApiError<PolicyApplyErrorResponse>).response;
+      throw new ApiError(
+        response,
+        error.status,
+        response.error.message ?? `Policy load failed (HTTP ${error.status}).`,
+      );
+    }
+
+    throw error;
+  }
 }
 
 const RootPath = `/policies/${encodeURIComponent(CONJUR_ACCOUNT)}/policy`;
@@ -48,39 +146,10 @@ export const policyService = {
   ) {
     const path = `${RootPath}/${encodeURIComponent(branch)}`;
 
-    try {
-      const response = await apiRequestText(path, {
-        method,
-        query: {
-          dryRun,
-        },
-        headers: {
-          accept: "text/plain",
-        },
-        body: policyContent,
-      });
-
-      return {
-        status: 200,
-        data: JSON.parse(response) as PolicyLoadResponse,
-      };
-    } catch (error) {
-      if (error instanceof ApiError && dryRun && error.status === 422) {
-        const policyError = isPolicyErrorResponse(error.response)
-          ? error.response
-          : {
-              status: "Invalid YAML",
-              errors: [],
-            };
-
-        throw new ApiError(
-          policyError,
-          error.status,
-          error.message,
-        );
-      }
-
-      throw error;
+    if (dryRun) {
+      return runDryRunPolicyLoad(path, policyContent, method);
     }
+
+    return runApplyPolicyLoad(path, policyContent, method);
   },
 };
