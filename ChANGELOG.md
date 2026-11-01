@@ -13,6 +13,20 @@ All notable changes to this project will be documented in this file.
 
 - API key rotation in in resource details for hosts and users
 
+- Can login with either password or API key
+
+- Added example OIDC config to the readme based on the keycloack setup script. 
+
+### Fixed 
+
+- Some error messages where being shown
+
+- When loading a policy with a user the API Key was not shown
+
+- How the grid layoat in the dashboard was organized
+
+- GCP authenticator must default to the name 'default'. This is due to conjur only allowing one GCP authenticator be created at a time. 
+
 ## [1.0.0] - 2026-08-17
 
 ### Added

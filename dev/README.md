@@ -88,7 +88,6 @@ using the values below.
 | redirect_uri | `http://localhost:5173/login/callback` |
 | provider_scope | `openid profile email` |
 | claim_mapping | `preferred_username` |
-| description (annotation) | `Local dev OIDC for Conjur React UI + Keycloak` |
 
 > Note: `keycloak_setup.sh` configures Keycloak (realm, client, user). It does not create the Conjur authenticator resource.
 
