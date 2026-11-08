@@ -37,6 +37,77 @@ function AuthenticatorFields({ schema, data, onChange }) {
     </>
   );
 }
+
+function parseEnforcedClaims(identity) {
+  if (typeof identity.enforced_claims !== "string") {
+    return;
+  }
+
+  const rawEnforcedClaims = identity.enforced_claims.trim();
+
+  if (!rawEnforcedClaims) {
+    delete identity.enforced_claims;
+    return;
+  }
+
+  const parsedEnforcedClaims = JSON.parse(rawEnforcedClaims);
+  if (!Array.isArray(parsedEnforcedClaims)) {
+    throw new Error("JWT enforced_claims must be a JSON array of claim names.");
+  }
+
+  identity.enforced_claims = parsedEnforcedClaims;
+}
+
+function parseClaimAliases(identity) {
+  if (typeof identity.claim_aliases !== "string") {
+    return;
+  }
+
+  const rawClaimAliases = identity.claim_aliases.trim();
+
+  if (!rawClaimAliases) {
+    delete identity.claim_aliases;
+    return;
+  }
+
+  const parsedClaimAliases = JSON.parse(rawClaimAliases);
+  if (
+    !parsedClaimAliases ||
+    typeof parsedClaimAliases !== "object" ||
+    Array.isArray(parsedClaimAliases)
+  ) {
+    throw new Error(
+      "JWT claim_aliases must be a JSON object mapping claims to aliases.",
+    );
+  }
+
+  identity.claim_aliases = parsedClaimAliases;
+}
+
+function normalizeJwtIdentity(identity) {
+  parseEnforcedClaims(identity);
+  parseClaimAliases(identity);
+}
+
+function parseJwksPublicKeys(publicKeys) {
+  const parsedPublicKeys = JSON.parse(publicKeys);
+
+  if (
+    !parsedPublicKeys ||
+    typeof parsedPublicKeys !== "object" ||
+    Array.isArray(parsedPublicKeys) ||
+    parsedPublicKeys.type !== "jwks" ||
+    !parsedPublicKeys.value ||
+    !Array.isArray(parsedPublicKeys.value.keys)
+  ) {
+    throw new Error(
+      'JWT public_keys must be a JSON object in this format: {"type":"jwks","value":{"keys":[...]}}.',
+    );
+  }
+
+  return parsedPublicKeys;
+}
+
 export default function CreateAuthenticator() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
@@ -77,13 +148,13 @@ export default function CreateAuthenticator() {
 
       for (const [key, value] of Object.entries(payload.data ?? {})) {
         if (key.startsWith(identityPrefix)) {
-          identity[key.slice(identityPrefix?.length)] = value;
+          identity[key.slice(identityPrefix.length)] = value;
         } else {
           flatData[key] = value;
         }
       }
 
-      if (Object.keys(identity)?.length > 0) {
+      if (Object.keys(identity).length > 0) {
         flatData.identity = identity;
       }
       payload.data = flatData;
@@ -91,73 +162,27 @@ export default function CreateAuthenticator() {
         payload.type === "jwt" &&
         typeof payload.data.public_keys === "string"
       ) {
-        const parsedPublicKeys = JSON.parse(payload.data.public_keys);
-        if (
-          !parsedPublicKeys ||
-          typeof parsedPublicKeys !== "object" ||
-          Array.isArray(parsedPublicKeys) ||
-          parsedPublicKeys.type !== "jwks" ||
-          !parsedPublicKeys.value ||
-          !Array.isArray(parsedPublicKeys.value.keys)
-        ) {
-          throw new Error(
-            "JWT public_keys must be a JSON object in this format: {\"type\":\"jwks\",\"value\":{\"keys\":[...]}}.",
-          );
-        }
-
-        payload.data.public_keys = parsedPublicKeys;
+        payload.data.public_keys = parseJwksPublicKeys(
+          payload.data.public_keys,
+        );
       }
 
-      if (payload.type === "jwt" && payload.data?.identity) {
-        const { identity } = payload.data;
-
-        if (typeof identity.enforced_claims === "string") {
-          const rawEnforcedClaims = identity.enforced_claims.trim();
-
-          if (!rawEnforcedClaims) {
-            delete identity.enforced_claims;
-          } else {
-            const parsedEnforcedClaims = JSON.parse(rawEnforcedClaims);
-            if (!Array.isArray(parsedEnforcedClaims)) {
-              throw new Error(
-                "JWT enforced_claims must be a JSON array of claim names.",
-              );
-            }
-            identity.enforced_claims = parsedEnforcedClaims;
-          }
-        }
-
-        if (typeof identity.claim_aliases === "string") {
-          const rawClaimAliases = identity.claim_aliases.trim();
-
-          if (!rawClaimAliases) {
-            delete identity.claim_aliases;
-          } else {
-            const parsedClaimAliases = JSON.parse(rawClaimAliases);
-            if (
-              !parsedClaimAliases ||
-              typeof parsedClaimAliases !== "object" ||
-              Array.isArray(parsedClaimAliases)
-            ) {
-              throw new Error(
-                "JWT claim_aliases must be a JSON object mapping claims to aliases.",
-              );
-            }
-            identity.claim_aliases = parsedClaimAliases;
-          }
-        }
+      if (payload.type === "jwt" && payload.data.identity) {
+        normalizeJwtIdentity(payload.data.identity);
       }
 
-    if (payload.type === "gcp") {
-      const { data, ...rest } = payload; 
-      rest.name = "default"; // Set the name to "default" for GCP authenticators
-      payload = rest; // Reassign the cleaned object back to payload
-    }
+      if (payload.type === "gcp") {
+        const rest = { ...payload };
+        delete rest.data;
+        rest.name = "default";
+        payload = rest;
+      }
 
-    if (payload.type === "aws") {
-      const { data, ...rest } = payload; 
-      payload = rest; // Reassign the cleaned object back to payload
-    }
+      if (payload.type === "aws") {
+        const rest = { ...payload };
+        delete rest.data;
+        payload = rest;
+      }
 
       const response = await authenticatorsService.create(payload);
       setError(null);
@@ -203,21 +228,20 @@ export default function CreateAuthenticator() {
           ))}
         </Select>
 
-      {form.type !== "GCP" && (
-        <TextField
-          label="Name"
-          value={form.name}
-          required={true}
-          onChange={(event) =>
-            setForm((previous) => ({
-              ...previous,
-              name: event.target.value,
-            }))
-          }
-          fullWidth
-        />
-        )}  
-        
+        {form.type !== "GCP" && (
+          <TextField
+            label="Name"
+            value={form.name}
+            required={true}
+            onChange={(event) =>
+              setForm((previous) => ({
+                ...previous,
+                name: event.target.value,
+              }))
+            }
+            fullWidth
+          />
+        )}
 
         <FormControlLabel
           control={

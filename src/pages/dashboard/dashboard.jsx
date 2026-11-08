@@ -1,6 +1,4 @@
-// React hooks for local component state and lifecycle side effects.
 import { useEffect, useState } from "react";
-// MUI UI primitives used to build the page.
 import {
   Alert,
   Box,
@@ -19,34 +17,23 @@ function ResourceCount({ title, type }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Effect runs once on first render (equivalent idea to ngOnInit).
   useEffect(() => {
-    // Prevents state updates if component unmounts before request completes.
     let isMounted = true;
 
-    // Async function for data loading.
     async function loadResources() {
-      // Request started: set loading true and clear previous error.
       setLoading(true);
       setError("");
 
       try {
-        // Service call returns a Promise.
-        // Endpoint can vary by backend/version:
-        // - Resource[]
-        // - { items: Resource[] }
-        // - { resources: Resource[] }
         const response = await resourcesService.list({
           count: true,
           kind: type,
         });
 
-        // Only update state if component still exists.
         if (isMounted) {
           setResourceCount(response);
         }
       } catch (requestError) {
-        // Normalize unknown error into a readable string.
         if (isMounted) {
           setError(
             requestError instanceof Error
@@ -55,24 +42,20 @@ function ResourceCount({ title, type }) {
           );
         }
       } finally {
-        // Always clear loading after request finishes.
         if (isMounted) {
           setLoading(false);
         }
       }
     }
 
-    // Execute the async loader.
     loadResources();
 
-    // Cleanup runs on unmount.
     return () => {
       isMounted = false;
     };
   }, [type]);
 
   return (
-    // Outer page spacing wrapper.
     <Paper
       sx={{
         width: "100%",
@@ -106,33 +89,22 @@ function AuthenticatorCount({ type }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Effect runs once on first render (equivalent idea to ngOnInit).
   useEffect(() => {
-    // Prevents state updates if component unmounts before request completes.
     let isMounted = true;
 
-    // Async function for data loading.
     async function loadResources() {
-      // Request started: set loading true and clear previous error.
       setLoading(true);
       setError("");
 
       try {
-        // Service call returns a Promise.
-        // Endpoint can vary by backend/version:
-        // - Resource[]
-        // - { items: Resource[] }
-        // - { resources: Resource[] }
         const response = await authenticatorsService.list({
           type: type,
         });
 
-        // Only update state if component still exists.
         if (isMounted) {
           setResourceCount(response.count);
         }
       } catch (requestError) {
-        // Normalize unknown error into a readable string.
         if (isMounted) {
           setError(
             requestError instanceof Error
@@ -141,24 +113,20 @@ function AuthenticatorCount({ type }) {
           );
         }
       } finally {
-        // Always clear loading after request finishes.
         if (isMounted) {
           setLoading(false);
         }
       }
     }
 
-    // Execute the async loader.
     loadResources();
 
-    // Cleanup runs on unmount.
     return () => {
       isMounted = false;
     };
   }, [type]);
 
   return (
-    // Outer page spacing wrapper.
     <Paper
       sx={{
         width: "100%",

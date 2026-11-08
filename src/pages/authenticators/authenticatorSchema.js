@@ -63,34 +63,6 @@ export const authenticatorSchemas = {
       },
     ],
   },
-
-  // OIDC: {
-  //   authType: "oidc",
-  //   forms: [
-  //     {
-  //       key: "provider_uri",
-  //       label: "Provider URI",
-  //       type: "text",
-  //       required: true,
-  //       rows: 1,
-  //     },
-  //     {
-  //       key: "ca_cert",
-  //       label: "CA Certificate",
-  //       type: "textarea",
-  //       required: false,
-  //       rows: 1,
-  //     },
-  //     {
-  //       key: "id_token_user_property",
-  //       label: "ID Token User Property",
-  //       type: "text",
-  //       required: true,
-  //       rows: 1,
-  //     },
-  //   ],
-  // },
-
   JWT: {
     authType: "jwt",
     forms: [
@@ -166,7 +138,6 @@ export const authenticatorSchemas = {
       },
     ],
   },
-
   K8S: {
     authType: "k8s",
     forms: [

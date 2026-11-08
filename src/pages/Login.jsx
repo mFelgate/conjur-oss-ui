@@ -47,12 +47,10 @@ export default function Login() {
     async function loadProvider() {
       try {
         const response = await authenticatorsService.providers();
-        // Only update state if component still exists.
         if (isMounted) {
           setProviders(response);
         }
       } catch (requestError) {
-        // Normalize unknown error into a readable string.
         if (isMounted) {
           setLocalError(
             requestError instanceof Error
@@ -60,8 +58,6 @@ export default function Login() {
               : "Failed to load providers.",
           );
         }
-      } finally {
-        // Auth loading is managed by AuthContext.
       }
     }
     loadProvider();
