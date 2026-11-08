@@ -32,6 +32,42 @@ function throwAuthErrorMessage(error: ApiError<AuthErrorResponse | string>): nev
   throw error;
 }
 
+function throwRotateApiKeyError(error: unknown): never {
+  if (error instanceof ApiError) {
+    if (error.status === 404) {
+      throw new Error("Role not found for API key rotation.");
+    }
+
+    if (error.status === 401) {
+      throw new Error("Unauthorized to rotate API key for this role.");
+    }
+
+    throwAuthErrorMessage(error as ApiError<AuthErrorResponse | string>);
+  }
+
+  throw error instanceof Error ? error : new Error("Failed to rotate API key.");
+}
+
+function throwChangePasswordError(error: unknown, login: string): never {
+  if (error instanceof ApiError) {
+    if (error.status === 401) {
+      throw new Error("Current password/API key is invalid.");
+    }
+
+    if (error.status === 404) {
+      throw new Error(`User '${login}' not found.`);
+    }
+
+    if (error.status === 422) {
+      throw new Error("Invalid password update request.");
+    }
+
+    throwAuthErrorMessage(error as ApiError<AuthErrorResponse | string>);
+  }
+
+  throw error instanceof Error ? error : new Error("Failed to change password.");
+}
+
 function toBase64(value: string): string {
   const bytes = new TextEncoder().encode(value);
   let binary = "";
@@ -117,21 +153,7 @@ export const authService = {
       headers: {
         accept: 'application/json',
       },
-    }).catch((error) => {
-      if (error instanceof ApiError) {
-        if (error.status === 404) {
-          throw new Error("Role not found for API key rotation.");
-        }
-
-        if (error.status === 401) {
-          throw new Error("Unauthorized to rotate API key for this role.");
-        }
-
-        throwAuthErrorMessage(error as ApiError<AuthErrorResponse | string>);
-      }
-
-      throw error;
-    });
+    }).catch(throwRotateApiKeyError);
   },
 
   changePassword(login: string, currentApiKey: string, newPassword: string) {
@@ -144,25 +166,7 @@ export const authService = {
         "Content-Type": "text/plain",
       },
       body: newPassword,
-    }).catch((error) => {
-      if (error instanceof ApiError) {
-        if (error.status === 401) {
-          throw new Error("Current password/API key is invalid.");
-        }
-
-        if (error.status === 404) {
-          throw new Error(`User '${login}' not found.`);
-        }
-
-        if (error.status === 422) {
-          throw new Error("Invalid password update request.");
-        }
-
-        throwAuthErrorMessage(error as ApiError<AuthErrorResponse | string>);
-      }
-
-      throw error;
-    });
+    }).catch((error) => throwChangePasswordError(error, login));
   },
 
   whoAmI() {

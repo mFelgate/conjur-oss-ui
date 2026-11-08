@@ -8,6 +8,19 @@ import type {
 import { CONJUR_ACCOUNT } from "../config";
 const RootPath = `/resources/${encodeURIComponent(CONJUR_ACCOUNT)}`;
 
+function throwResourceError(error: unknown): never {
+  if (error instanceof ApiError) {
+    const response = (error as ApiError<ConjurErrorResponse>).response;
+    const message = getConjurErrorMessage(response);
+
+    if (message) {
+      throw new Error(message);
+    }
+  }
+
+  throw error instanceof Error ? error : new Error("Failed to load resource.");
+}
+
 export const resourcesService = {
   list(params: ResourcesQueryRequest = {}) {
     return apiRequest<ResourcesResponse>(RootPath, {
@@ -27,17 +40,6 @@ export const resourcesService = {
       headers: {
         accept: 'application/json',
       },
-    }).catch((error) => {
-      if (error instanceof ApiError) {
-        const response = (error as ApiError<ConjurErrorResponse>).response;
-        const message = getConjurErrorMessage(response);
-
-        if (message) {
-          throw new Error(message);
-        }
-      }
-
-      throw error;
-    })
+    }).catch(throwResourceError)
   }
 }
