@@ -86,7 +86,7 @@ For production deployments, high-availability configurations, compliance reporti
 - ✅ View authenticator details
 - ✅ Enable Authenticators
 - ✅ Create Authenticators with V2 API
-- ✅ dynamic forms for authentictors 
+- ✅ Dynamic forms for authenticators
 - ⬜ Authenticator validation/testing
 
 ### Policy Management
@@ -162,7 +162,7 @@ client needs OIDC).
 ## Screenshots
 
 ### Authentication
-#### Loginto the ui with a apikey or with oidc authentication if configured
+#### Log in to the UI with an API key or OIDC authentication, if configured
 View an overview of the Conjur environment and common administration workflows.
 
 ![Dashboard](./screenshots/login.png)
@@ -192,12 +192,12 @@ Use the profile page to rotate API keys and change your password.
 
 #### Resources List
 Browse all Conjur resources with filtering and quick access to resource details.
-This includes server side filtering, searching and pagination
+This includes server-side filtering, searching, and pagination.
 
 ![Resources List](./screenshots/resourcepage.png)
 
 #### Resource Details
-View resource metadata, annotations, permissions, and ownership. Different sections will be displayed based on resource type, like group, secret and policy.
+View resource metadata, annotations, permissions, and ownership. Different sections are displayed based on resource type, such as group, secret, and policy.
 
 ![Resource Details](./screenshots/ResourceDetails.png)
 

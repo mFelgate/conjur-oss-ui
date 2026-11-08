@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Fixed
+
+- Fixed desktop navigation so the sidebar no longer obscures page content.
+
+- Improved handling of wide tables and policy editor content.
+
+- Improved mobile layouts for policy, resource, authenticator, secret, group, and detail pages.
+
+- Made policy editing controls easier to use on smaller screens.
+
+- Improved the readability of policy dry-run results.
+
 
 ## [1.1.0] - 2026-09-06
 
@@ -11,21 +25,21 @@ All notable changes to this project will be documented in this file.
 
 - Password changing for the current user, requiring the API key or password to be re-entered.
 
-- API key rotation in in resource details for hosts and users
+- API key rotation in resource details for hosts and users.
 
-- Can login with either password or API key
+- Login with either a password or an API key.
 
-- Added example OIDC config to the readme based on the keycloack setup script. 
+- Added example OIDC configuration to the README based on the Keycloak setup script.
 
 ### Fixed 
 
-- Some error messages where being shown
+- Some error messages were not being shown.
 
-- When loading a policy with a user the API Key was not shown
+- When loading a policy with a user, the API key was not shown.
 
-- How the grid layoat in the dashboard was organized
+- Improved the dashboard grid layout.
 
-- GCP authenticator must default to the name 'default'. This is due to conjur only allowing one GCP authenticator be created at a time. 
+- GCP authenticators must default to the name 'default' because Conjur only allows one GCP authenticator to be created at a time.
 
 ## [1.0.0] - 2026-08-17
 
