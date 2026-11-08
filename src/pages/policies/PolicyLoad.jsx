@@ -31,7 +31,6 @@ export default function PolicyLoad() {
   const [method, setMethod] = useState("POST");
   const decorationsRef = useRef([]);
 
-  //  User for the editor instance and monaco instance
   const editorRef = useRef(null);
   const monacoRef = useRef(null);
   const handleEditorDidMount = (editor, monaco) => {
@@ -187,7 +186,6 @@ export default function PolicyLoad() {
     setDeletedItems([]);
 
     try {
-      // TODO: Call policyService.loadPolicy(policyText, dryRun)
       const response = await policyService.loadPolicy(
         policyText,
         branch,
@@ -231,7 +229,11 @@ export default function PolicyLoad() {
           />
           <Paper variant="outlined" sx={{ p: 2 }}>
             <Stack spacing={2}>
-              <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
+                spacing={2}
+                sx={{ alignItems: { xs: "stretch", sm: "center" } }}
+              >
                 <FormControlLabel
                   control={
                     <Switch
@@ -254,23 +256,33 @@ export default function PolicyLoad() {
                     }
                   }}
                   aria-label="policy operation"
+                  sx={{ width: { xs: "100%", sm: "auto" } }}
                 >
-                  <ToggleButton value="POST">Create</ToggleButton>
-                  <ToggleButton value="PATCH">Update</ToggleButton>
-                  <ToggleButton value="PUT">Replace</ToggleButton>
+                  <ToggleButton value="POST" sx={{ flex: 1 }}>
+                    Create
+                  </ToggleButton>
+                  <ToggleButton value="PATCH" sx={{ flex: 1 }}>
+                    Update
+                  </ToggleButton>
+                  <ToggleButton value="PUT" sx={{ flex: 1 }}>
+                    Replace
+                  </ToggleButton>
                 </ToggleButtonGroup>
               </Stack>
 
-              <Editor
-                height="600px"
-                defaultLanguage="yaml"
-                value={policyText}
-                onMount={handleEditorDidMount}
-                onChange={(value) => {
-                  setPolicyText(value ?? "");
-                  resetPolicyPreview();
-                }}
-              />
+              <Box sx={{ height: { xs: 400, sm: 600 }, minWidth: 0 }}>
+                <Editor
+                  height="100%"
+                  width="100%"
+                  defaultLanguage="yaml"
+                  value={policyText}
+                  onMount={handleEditorDidMount}
+                  onChange={(value) => {
+                    setPolicyText(value ?? "");
+                    resetPolicyPreview();
+                  }}
+                />
+              </Box>
               {error && <Alert severity="error">{error}</Alert>}
               <Stack direction="column" spacing={2} sx={{ alignItems: "flex-start" }}>
                 <Button
@@ -314,11 +326,32 @@ export default function PolicyLoad() {
           )}
 
           {!error && policyResponse && dryRun && (
-            <Stack spacing={2}>
-              <PolicyCreated items={createdItems} />
-              <PolicyDeleted items={deletedItems} />
-              <PolicyUpdates UpdatedResources={policyResponse.updated} />
-            </Stack>
+            <Box
+              sx={{
+                display: "grid",
+                gap: 2,
+                alignItems: "start",
+                gridTemplateColumns: {
+                  xs: "1fr",
+                  sm: "1fr",
+                  md: "repeat(3, minmax(0, 1fr))",
+                },
+              }}
+            >
+              {createdItems.length > 0 && (
+                <Box>
+                  <PolicyCreated items={createdItems} />
+                </Box>
+              )}
+              {deletedItems.length > 0 && (
+                <Box>
+                  <PolicyDeleted items={deletedItems} />
+                </Box>
+              )}
+              <Box>
+                <PolicyUpdates UpdatedResources={policyResponse.updated} />
+              </Box>
+            </Box>
           )}
         </Stack>
       </Container>

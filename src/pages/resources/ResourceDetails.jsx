@@ -21,11 +21,23 @@ import ApiKeyDetails from "../apiKey/apiKeyDetails.jsx";
 
 export function DetailRow({ label, value }) {
   return (
-    <Stack direction="row" spacing={2} sx={{ justifyContent: "space-between" }}>
+    <Stack
+      direction={{ xs: "column", sm: "row" }}
+      spacing={{ xs: 0.25, sm: 2 }}
+      sx={{
+        justifyContent: "space-between",
+        minWidth: 0,
+      }}
+    >
       <Typography variant="body2" color="text.secondary">
         {label}
       </Typography>
-      <Typography variant="body2">{value}</Typography>
+      <Typography
+        variant="body2"
+        sx={{ overflowWrap: "anywhere", textAlign: { sm: "right" } }}
+      >
+        {value}
+      </Typography>
     </Stack>
   );
 }
@@ -85,7 +97,11 @@ export function ResourceInfo({ title, resource }) {
 
                 direction="row"
                 spacing={2}
-                sx={{ justifyContent: "space-between" }}
+                sx={{
+                  justifyContent: "space-between",
+                  minWidth: 0,
+                  flexWrap: "wrap",
+                }}
               >
                 <Typography variant="body2" color="text.secondary">
                   {permission.privilege}

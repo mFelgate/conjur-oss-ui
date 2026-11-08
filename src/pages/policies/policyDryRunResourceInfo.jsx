@@ -1,9 +1,8 @@
 import { Stack, Typography } from "@mui/material";
 
-export default function PolicyDryRunResourceInfo({ title, resource }) {
+export default function PolicyDryRunResourceInfo({ resource }) {
   return (
     <Stack spacing={0.5}>
-      <Typography variant="subtitle2">{title}</Typography>
       <Typography variant="body2">
         <strong>ID:</strong> {resource?.id}
       </Typography>

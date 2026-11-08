@@ -14,10 +14,7 @@ export default function PolicyDeleted({ items }) {
       <Stack spacing={1}>
         {items.map((resource) => (
           <Paper key={resource.id} variant="outlined" sx={{ p: 2 }}>
-            <PolicyDryRunResourceInfo
-              title="Deleted Resource"
-              resource={resource}
-            />
+            <PolicyDryRunResourceInfo resource={resource} />
           </Paper>
         ))}
       </Stack>

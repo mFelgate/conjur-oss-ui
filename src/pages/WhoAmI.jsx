@@ -16,14 +16,17 @@ import ApiKeyDetails from "./apiKey/apiKeyDetails.jsx";
 function DetailRow({ label, value }) {
   return (
     <Stack
-      direction="row"
-      spacing={2}
-      sx={{ justifyContent: "space-between" }}
+      direction={{ xs: "column", sm: "row" }}
+      spacing={{ xs: 0.25, sm: 2 }}
+      sx={{ justifyContent: "space-between", minWidth: 0 }}
     >
       <Typography variant="body2" color="text.secondary">
         {label}
       </Typography>
-      <Typography variant="body2" sx={{ textAlign: "right" }}>
+      <Typography
+        variant="body2"
+        sx={{ overflowWrap: "anywhere", textAlign: { sm: "right" } }}
+      >
         {String(value ?? "")}
       </Typography>
     </Stack>

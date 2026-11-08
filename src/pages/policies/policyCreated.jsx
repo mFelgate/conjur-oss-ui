@@ -14,10 +14,7 @@ export default function PolicyCreated({ items }) {
       <Stack spacing={1}>
         {items.map((resource) => (
           <Paper key={resource.id} variant="outlined" sx={{ p: 2 }}>
-            <PolicyDryRunResourceInfo
-              title="Created Resource"
-              resource={resource}
-            />
+            <PolicyDryRunResourceInfo resource={resource} />
           </Paper>
         ))}
       </Stack>

@@ -44,14 +44,6 @@ import WhoAmI from "./pages/WhoAmI";
 
 import "./App.css";
 
-function navPadding() {
-  if (location.pathname === "/login") {
-    return "0px";
-  }
-
-  return "240px";
-}
-
 function App() {
   return (
     <AuthProvider>
@@ -207,6 +199,8 @@ function NavBar({ mobileOpen, handleDrawerToggle }) {
             variant="permanent"
             sx={{
               display: { xs: "none", lg: "block" },
+              width: 240,
+              flexShrink: 0,
               "& .MuiDrawer-paper": {
                 width: 240,
                 boxSizing: "border-box",
@@ -289,8 +283,8 @@ function AppShell() {
           component="main"
           sx={{
             flexGrow: 1,
-            ml: { lg: navPadding() },
-            p: 3,
+            minWidth: 0,
+            p: { xs: 2, sm: 3 },
           }}
         >
           <AppRoutes />

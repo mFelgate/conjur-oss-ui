@@ -47,7 +47,6 @@ function AddMember({ serviceId, onMemberAdded }) {
       setError(
         error instanceof Error ? error.message : "Failed to add member.",
       );
-      // Handle error (e.g., show a notification)
     }
   };
 
@@ -57,8 +56,9 @@ function AddMember({ serviceId, onMemberAdded }) {
       <Box
         sx={{
           display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
           justifyContent: "space-between",
-          alignItems: "center",
+          alignItems: { xs: "stretch", sm: "center" },
           width: "100%",
           mb: 2,
         }}
@@ -68,16 +68,25 @@ function AddMember({ serviceId, onMemberAdded }) {
             Add Member
           </Button>
         ) : (
-          <Stack direction="row" spacing={1}>
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={1}
+            sx={{ width: { xs: "100%", sm: "auto" } }}
+          >
             <Button
               variant="contained"
               startIcon={<CheckIcon />}
               onClick={() => addMember(serviceId)}
+              sx={{ width: { xs: "100%", sm: "auto" } }}
             >
               Save
             </Button>
 
-            <Button startIcon={<CloseIcon />} onClick={cancelEdit}>
+            <Button
+              startIcon={<CloseIcon />}
+              onClick={cancelEdit}
+              sx={{ width: { xs: "100%", sm: "auto" } }}
+            >
               Cancel
             </Button>
           </Stack>
@@ -148,14 +157,11 @@ export default function MembershipGroups({ serviceId }) {
     }
   }
 
-  // Effect runs once on first render (equivalent idea to ngOnInit).
   useEffect(() => {
-    // Prevents state updates if component unmounts before request completes.
     let isMounted = true;
 
     loadMembers(serviceId, isMounted);
 
-    // Cleanup runs on unmount.
     return () => {
       isMounted = false;
     };

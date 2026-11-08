@@ -1,7 +1,5 @@
-// React hooks for local component state and lifecycle side effects.
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-// MUI UI primitives used to build the page.
 import {
   Alert,
   Box,
@@ -27,8 +25,6 @@ import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
-// Service-layer import (Angular-style service pattern).
-// The page calls this service; it does not call fetch() directly.
 import { resourcesService } from "../../services";
 
 import { useSearchParams } from "react-router-dom";
@@ -77,14 +73,8 @@ export default function Resources() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [count, setCount] = useState(0);
-
-  // Stores fetched resources from the API.
   const [resources, setResources] = useState([]);
-
-  // Tracks loading state so we can show spinner/feedback.
   const [loading, setLoading] = useState(true);
-
-  // Stores friendly error text when a request fails.
   const [error, setError] = useState("");
 
   function handleTypeChange(event) {
@@ -92,23 +82,14 @@ export default function Resources() {
     setPage(0);
   }
 
-  // Effect runs once on first render (equivalent idea to ngOnInit).
   useEffect(() => {
-    // Prevents state updates if component unmounts before request completes.
     let isMounted = true;
 
-    // Async function for data loading.
     async function loadResources() {
-      // Request started: set loading true and clear previous error.
       setLoading(true);
       setError("");
 
       try {
-        // Service call returns a Promise.
-        // Endpoint can vary by backend/version:
-        // - Resource[]
-        // - { items: Resource[] }
-        // - { resources: Resource[] }
         const response = await resourcesService.list({
           kind: selectedType || undefined,
           search: searchTerm || undefined,
@@ -122,13 +103,11 @@ export default function Resources() {
           count: true,
         });
 
-        // Only update state if component still exists.
         if (isMounted) {
           setResources(response);
           setCount(countRespons.count);
         }
       } catch (requestError) {
-        // Normalize unknown error into a readable string.
         if (isMounted) {
           setError(
             requestError instanceof Error
@@ -137,48 +116,37 @@ export default function Resources() {
           );
         }
       } finally {
-        // Always clear loading after request finishes.
         if (isMounted) {
           setLoading(false);
         }
       }
     }
 
-    // Execute the async loader.
     loadResources();
 
-    // Cleanup runs on unmount.
     return () => {
       isMounted = false;
     };
   }, [selectedType, searchTerm, page, rowsPerPage]);
 
   return (
-    // Outer page spacing wrapper.
     <Box sx={{ width: "100%" }}>
-      {/* Content width container */}
       <Container>
-        {/* Page title */}
         <Stack sx={{ justifyContent: "space-between", alignItems: "center" }}>
           <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
             Resources
           </Typography>
 
-          {/* <Stack direction="row" spacing={2} flexWrap="wrap" p={1} sx={{ mb: 2 }}>
-          <ResourceCount type="host" />
-          <ResourceCount type="variable" />
-          <ResourceCount type="user" />
-          <ResourceCount type="group" />
-        </Stack> */}
-
           <Typography variant="body1">
             Browse and manage all resources in your Conjur instance.
           </Typography>
         </Stack>
-        {/* Vertical stack for form + status + list */}
         <Stack spacing={2} sx={{ mt: 3 }}>
-          {/* Search field (client-side filter) */}
-          <Stack direction="row" spacing={2}>
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={2}
+            sx={{ alignItems: { xs: "stretch", sm: "center" } }}
+          >
             <TextField
               label="Search resources"
               value={searchInput}
@@ -203,13 +171,14 @@ export default function Resources() {
             </Select>
 
             <Button
+              variant="contained"
               onClick={() => setSearchTerm(searchInput)}
+              sx={{ width: { xs: "100%", sm: "auto" } }}
             >
               Search
             </Button>
           </Stack>
 
-          {/* Loading state UI */}
           {loading && (
             <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
               <CircularProgress size={18} />
@@ -217,15 +186,12 @@ export default function Resources() {
             </Stack>
           )}
 
-          {/* Error state UI */}
           {!loading && error && <Alert severity="error">{error}</Alert>}
 
-          {/* Empty state (no data returned) */}
           {!loading && !error && resources?.length === 0 && (
             <Alert severity="info">No resources returned by API.</Alert>
           )}
 
-          {/* Data list */}
           {!loading && !error && resources?.length > 0 && (
             <TableContainer component={Paper}>
               <TablePagination

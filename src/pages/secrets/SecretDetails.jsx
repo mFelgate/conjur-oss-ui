@@ -153,10 +153,12 @@ export function SecretValueField({ resource }) {
         <Box
           sx={{
             display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
             justifyContent: "space-between",
-            alignItems: "center",
+            alignItems: { xs: "stretch", sm: "center" },
             width: "100%",
             mb: 2,
+            gap: 1,
           }}
         >
           <Typography variant="h6" component="h1">
@@ -168,17 +170,27 @@ export function SecretValueField({ resource }) {
               Edit
             </Button>
           ) : (
-            <Stack direction="row" spacing={1}>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={1}
+              sx={{ width: { xs: "100%", sm: "auto" } }}
+            >
               <Button
                 variant="contained"
                 startIcon={<CheckIcon />}
                 onClick={() => saveSecret(serviceId)}
                 disabled={saving}
+                sx={{ width: { xs: "100%", sm: "auto" } }}
               >
                 Save
               </Button>
 
-              <Button startIcon={<CloseIcon />} onClick={cancelEdit} disabled={saving}>
+              <Button
+                startIcon={<CloseIcon />}
+                onClick={cancelEdit}
+                disabled={saving}
+                sx={{ width: { xs: "100%", sm: "auto" } }}
+              >
                 Cancel
               </Button>
             </Stack>

@@ -59,12 +59,13 @@ export default function PolicyUpdates({ UpdatedResources }) {
   function RenderChanges(changes, Type) {
     return (
       <>
-        <Typography variant="subtitle2" color="text.secondary">
+        <Typography variant="body2" color="text.secondary">
           {Type}
         </Typography>
         {changes.added.map((item) => (
           <Box key={item}>
             <Typography
+              variant="body2"
               sx={{ color: "success.main", overflowWrap: "anywhere" }}
             >
               + {item}
@@ -73,7 +74,10 @@ export default function PolicyUpdates({ UpdatedResources }) {
         ))}
         {changes.removed.map((item) => (
           <Box key={item}>
-            <Typography sx={{ color: "error.main", overflowWrap: "anywhere" }}>
+            <Typography
+              variant="body2"
+              sx={{ color: "error.main", overflowWrap: "anywhere" }}
+            >
               - {item}
             </Typography>
           </Box>
@@ -85,20 +89,20 @@ export default function PolicyUpdates({ UpdatedResources }) {
   function RenderObjectChanges(changes, Type) {
     return (
       <>
-        <Typography variant="subtitle2" color="text.secondary">
+        <Typography variant="body2" color="text.secondary">
           {Type}
         </Typography>
 
         {Object.entries(changes.added).map(([key, value]) => (
           <Box key={key}>
-            <Typography sx={{ color: "success.main" }}>
+            <Typography variant="body2" sx={{ color: "success.main" }}>
               + {key}: {JSON.stringify(value)}
             </Typography>
           </Box>
         ))}
         {Object.entries(changes.removed).map(([key, value]) => (
           <Box key={key}>
-            <Typography sx={{ color: "error.main" }}>
+            <Typography variant="body2" sx={{ color: "error.main" }}>
               - {key}: {JSON.stringify(value)}
             </Typography>
           </Box>
@@ -150,7 +154,7 @@ export default function PolicyUpdates({ UpdatedResources }) {
         return (
           <Accordion key={resourceId} variant="outlined">
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography variant="h6" color="text.secondary">
+              <Typography variant="body2" color="text.secondary">
                 {resourceId}
               </Typography>
             </AccordionSummary>

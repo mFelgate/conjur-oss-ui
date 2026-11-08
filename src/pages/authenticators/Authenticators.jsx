@@ -102,11 +102,8 @@ export default function Authenticators() {
   const [count, setCount] = useState(0);
   const [authType, setAuthType] = useState(0);
   const [authenticators, setAuthenticators] = useState([]);
-
   const [loading, setLoading] = useState(true);
-  // Stores friendly error text when a request fails.
   const [error, setError] = useState("");
-  // Controlled input value for search text.
 
   function handleTypeChange(event) {
     setLoading(true);
@@ -181,9 +178,7 @@ export default function Authenticators() {
     }
   }
 
-  // Effect runs once on first render (equivalent idea to ngOnInit).
   useEffect(() => {
-    // Prevents state updates if component unmounts before request completes.
     let isMounted = true;
     async function loadAuthenticators() {
       try {
@@ -240,7 +235,6 @@ export default function Authenticators() {
 
     loadAuthenticators();
 
-    // Cleanup runs on unmount.
     return () => {
       isMounted = false;
     };
@@ -252,10 +246,12 @@ export default function Authenticators() {
         <Box
           sx={{
             display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
             justifyContent: "space-between",
-            alignItems: "center",
+            alignItems: { xs: "stretch", sm: "center" },
             width: "100%",
             mb: 2,
+            gap: 2,
           }}
         >
           <Typography variant="h4" component="h1">
@@ -266,16 +262,22 @@ export default function Authenticators() {
             variant="contained"
             startIcon={<AddIcon />}
             onClick={() => navigate("/authenticators/create")}
+            sx={{ width: { xs: "100%", sm: "auto" } }}
           >
             Create Authenticator
           </Button>
         </Box>
         <Stack spacing={2} sx={{ mt: 3 }}>
-          <Stack direction="row" spacing={2} sx={{ flexWrap: "wrap" }}>
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={2}
+            sx={{ alignItems: { xs: "stretch", sm: "center" } }}
+          >
             <Select
               value={authType || ""}
               onChange={handleTypeChange}
               displayEmpty
+              sx={{ width: { xs: "100%", sm: "auto" } }}
             >
               <MenuItem value="">All Authenticators</MenuItem>
               <MenuItem value="oidc">OIDC</MenuItem>
